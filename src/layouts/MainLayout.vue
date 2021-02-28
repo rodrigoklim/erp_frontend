@@ -27,7 +27,7 @@
               style="font-family: poppins; font-weight:70px; font-size: 20px; color:#007bff; opacity: 0.75"
             />
             <q-route-tab
-              to="/preSell"
+              to="/pre-venda"
               label="Pré-Venda"
               name="presell"
               style="font-family: poppins; font-weight:70px; font-size: 20px; color:#007bff; opacity: 0.75"
