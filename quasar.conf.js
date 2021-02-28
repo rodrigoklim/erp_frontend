@@ -124,8 +124,8 @@ module.exports = function (/* ctx */) {
       workboxPluginMode: 'GenerateSW', // 'GenerateSW' or 'InjectManifest'
       workboxOptions: {}, // only for GenerateSW
       manifest: {
-        name: 'criomec',
-        short_name: 'criomec',
+        name: 'Criomec',
+        short_name: 'Criomec',
         description: 'erp criomec',
         display: 'standalone',
         orientation: 'portrait',
