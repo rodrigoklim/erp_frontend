@@ -23,108 +23,56 @@
               inset
             />
             <q-card-section>
-              <div class="row">
-                <div class="col-11">
-                  <div class="col-4">
+              <div class="col-11">
+                <div class="row justify-center">
+                  <div class="col-8 q-mr-md">
                     <q-card dark>
-                      <q-stepper
-                        v-model="step"
-                        ref="stepper"
-                        color="primary"
-                        animated
-                        dark
-                        style="font-weight: 300"
-                      >
-                        <q-step
-                          :name="1"
-                          title="Selecione o Cliente"
-                          icon="settings"
-                          :done="step > 1"
-                        >
-                          <q-table
-                            class="text-uppercase"
-                            :dense="$q.screen.lt.md"
-                            :data="costumers"
-                            :columns="columns"
-                            :filter="filter"
-                            @row-click="costumerDetails"
-                            row-key="name"
-                            dark
-                            color="amber"
-                            style="color:white; opacity:0.95; font-family: poppins; font-weight: 300;"
-                          >
-                            <template v-slot:top-right>
-                              <q-input
-                                borderless
-                                outlined
-                                dense
-                                dark
-                                debounce="300"
-                                v-model="filter"
-                                placeholder="Pesquisar"
-                              >
-                                <template v-slot:append>
-                                  <q-icon name="search" />
-                                </template>
-                              </q-input>
-                            </template>
-                          </q-table>
-                        </q-step>
-                        <q-step
-                          :name="2"
-                          title="Create an ad group"
-                          caption="Optional"
-                          icon="create_new_folder"
-                          :done="step > 2"
-                        >
-                          An ad group contains one or more ads which target a shared set of keywords.
-                        </q-step>
-
-                        <q-step
-                          :name="3"
-                          title="Ad template"
-                          icon="assignment"
-                          disable
-                        >
-                          This step won't show up because it is disabled.
-                        </q-step>
-
-                        <q-step
-                          :name="4"
-                          title="Create an ad"
-                          icon="add_comment"
-                        >
-                          Try out different ad text to see what brings in the most customers, and learn how to
-                          enhance your ads using features like ad extensions. If you run into any problems with
-                          your ads, find out how to tell if they're running and how to resolve approval issues.
-                        </q-step>
-
-                        <template v-slot:navigation>
-                          <q-stepper-navigation>
-                            <q-btn
-                              @click="$refs.stepper.next()"
-                              color="primary"
-                              :label="step === 4 ? 'Finish' : 'Continue'"
-                            />
-                            <q-btn
-                              v-if="step > 1"
-                              flat
-                              color="primary"
-                              @click="$refs.stepper.previous()"
-                              label="Back"
-                              class="q-ml-sm"
-                            />
-                          </q-stepper-navigation>
-                        </template>
-                      </q-stepper>
+                      <pre-sell-steper></pre-sell-steper>
                     </q-card>
                   </div>
-                  <div class="col-8">
+                  <div class="col-3 q-ml-md">
                     <q-card dark>
-
+                      <q-card-section>
+                        <div class="text-h5">Pré-Venda</div>
+                      </q-card-section>
+                      <q-separator
+                        color="white"
+                        style="opacity:0.85"
+                      />
+                      <q-card-section class="q-pa-none q-ma-none">
+                        <q-input
+                          v-model="presell.costumer"
+                          outlined
+                          dark
+                          label="Cliente"
+                          class="text-uppercase q-pa-sm q-ma-none"
+                          :rules="[val => !!val || 'Campo obrigatório.']"
+                        />
+                      </q-card-section>
+                      <q-card-section class="q-pa-none q-ma-none">
+                        <q-input
+                          v-model="presell.address"
+                          outlined
+                          dark
+                          label="Endereço"
+                          class="text-uppercase q-pa-sm q-ma-none"
+                          :rules="[val => !!val || 'Campo obrigatório.']"
+                        />
+                      </q-card-section>
+                      <q-card-section class="q-pa-none q-ma-none">
+                        <q-input
+                          v-model="presell.deliveryPeriod"
+                          outlined
+                          dark
+                          label="Período de Entrega"
+                          class="text-uppercase q-pa-sm q-ma-none"
+                          :rules="[val => !!val || 'Campo obrigatório.']"
+                        />
+                      </q-card-section>
                     </q-card>
                   </div>
                 </div>
+
               </div>
             </q-card-section>
           </q-card>
@@ -136,67 +84,41 @@
 </template>
 
 <script>
-import apiClient from 'src/services/api'
+import PreSellSteper from 'src/components/PreSellSteper.vue'
+import EventBus from 'src/boot/EventBus'
+
 export default {
+  components: { PreSellSteper },
   name: 'PreSell',
   data () {
     return {
-      step: 1,
-      costumers: [],
-      filter: '',
-      columns: [
-        { name: 'register_number', label: 'CNPJ / CPF', align: 'center', field: 'register_number' },
-        { name: 'company_name', align: 'left', label: 'Nome Fantasia', field: 'company_name', sortable: true },
-        { name: 'contact', align: 'center', label: 'Contato', field: 'contact', sortable: true },
-        { name: 'zone', align: 'center', label: 'Região', field: 'zone', sortable: true }
-      ]
+      presell: {
+        costumer: [],
+        address: [],
+        addressId: '',
+        deliveryPeriod: ''
+
+      },
+      costumer: []
     }
-  },
-  mounted () {
-    this.visible = true
-    const self = this
-    const url = '/costumer/show'
-    const data = {
-      headers: {
-        Authorization: 'Bearer ' + localStorage.token
-      }
-    }
-    apiClient.get(url, data).then(response => {
-      console.log(response.data)
-      self.costumers = response.data
-      self.visible = false
-    }).catch(error => {
-      if (error.response) {
-        this.handleError()
-        this.submitting = false
-        console.log(error.response.data)
-        console.log(error.response.status)
-        console.log(error.response.headers)
-      } else if (error.request) {
-        this.handleError()
-        this.submitting = false
-        console.log(error.request)
-      } else {
-        // Something happened in setting up the request and triggered an Error
-        this.handleError()
-        console.log('Error', error.message)
-      }
-    })
   },
   methods: {
-    costumerDetails (evt, row, index) {
-      this.company_name = row.company_name
-      // this.address = row.register[0].address[0].street + ', ' + row.register[0].address[0].number + ', ' + row.register[0].address[0].complement + ', ' + row.register[0].address[0].city + ' - ' + row.register[0].address[0].state
-      this.phone_1 = row.register[0].phone_1
-      if (row.register[0].phone_1zap) {
-        const phone = row.register[0].phone_1
-        const user = localStorage.name
-        this.zap = true
-        this.link = 'https://api.whatsapp.com/send?phone=55' + phone + '&text=Oi%2C%20aqui%20%C3%A9%20' + user + '%20da%20Criomec%2C%20tudo%20bem%3F'
-      }
-      this.pay_method = row.register[0].pay_method.payment_description
-      this.costumer = row
+    updateCostumer (row) {
+      this.presell.costumer = row.company_name
+    },
+    updateAddress (data) {
+      this.presell.address = data.label
+      this.presell.addressId = data.id
+      this.presell.deliveryPeriod = data.period
     }
+  },
+  created () {
+    EventBus.$on('costumer', (row) => {
+      this.updateCostumer(row)
+    })
+    EventBus.$on('address', (data) => {
+      this.updateAddress(data)
+    })
   }
 }
 </script>
