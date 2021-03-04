@@ -81,6 +81,42 @@
                           :rules="[val => !!val || 'Campo obrigatório.']"
                         />
                       </q-card-section>
+                      <q-card-section class="q-pa-none q-ma-none">
+                        <q-input
+                          v-model="presell.payment.payment_description"
+                          outlined
+                          dark
+                          label="Forma de Pagamento"
+                          class="text-uppercase q-pa-sm q-ma-none"
+                          :rules="[val => !!val || 'Campo obrigatório.']"
+                        />
+                      </q-card-section>
+                      <q-card-section>
+                        <div class="row">
+                          <div class="col-8">
+                            <div
+                              class="text"
+                              style="font-weight: 300; font-size:17px; opacity: 0.75"
+                            >Nota Fiscal: </div>
+                          </div>
+                          <div class="col-4 self-start">
+                            <div v-if="presell.nf === true">
+                              <q-icon
+                                name="check_circle_outlined"
+                                color="teal"
+                                size="sm"
+                              />
+                            </div>
+                            <div v-else-if="presell.nf === false">
+                              <q-icon
+                                name="highlight_off"
+                                color="red-6"
+                                size="sm"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </q-card-section>
                     </q-card>
                   </div>
                 </div>
@@ -109,8 +145,9 @@ export default {
         address: [],
         addressId: '',
         deliveryPeriod: '',
-        deliveryDate: ''
-
+        deliveryDate: '',
+        payment: '',
+        nf: ''
       },
       costumer: []
     }
@@ -124,6 +161,10 @@ export default {
       this.presell.addressId = data.id
       this.presell.deliveryPeriod = data.period
       this.presell.deliveryDate = data.deliveryDate
+    },
+    updatePayment (data) {
+      this.presell.payment = data[0]
+      this.presell.nf = data[1]
     }
   },
   created () {
@@ -132,6 +173,9 @@ export default {
     })
     EventBus.$on('address', (data) => {
       this.updateAddress(data)
+    })
+    EventBus.$on('presellPayment', (data) => {
+      this.updatePayment(data)
     })
   }
 }

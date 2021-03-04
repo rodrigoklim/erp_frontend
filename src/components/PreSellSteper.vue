@@ -258,6 +258,7 @@ export default {
       address: [],
       selectedAddress: '',
       filter: '',
+      payment: [],
       nf: false,
       pamsg: 0,
       deliveryDate: moment().add(1, 'days').format('DD/MM/YYYY'),
@@ -355,7 +356,6 @@ export default {
       EventBus.$emit('costumer', row)
     },
     paymentMethod (payData) {
-      console.log(payData)
       // const self = this
       const url = '/costumer/payment'
       const data = {
@@ -367,7 +367,7 @@ export default {
         }
       }
       apiClient.post(url, data, config).then(response => {
-        console.log(response.data)
+        this.payment = response.data
       }).catch(error => {
         if (error.response) {
           this.handleError()
@@ -410,6 +410,12 @@ export default {
           })
         }
       } else if (this.step === 3) {
+        console.log(this.payment.length)
+        if (this.payment.length === 0) {
+          EventBus.$emit('presellPayment', [this.costumer.pay_method, this.nf])
+        } else {
+          EventBus.$emit('presellPayment', [this.payment, this.nf])
+        }
         this.$refs.stepper.next()
       }
     }
