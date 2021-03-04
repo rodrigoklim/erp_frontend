@@ -81,6 +81,7 @@
                     dark
                     label="Data de Entrega"
                     v-model="deliveryDate"
+                    @input="selectedPeriod"
                     :rules="[val => !!val || 'Campo obrigatório.']"
                     style="width: 100%;"
                   >
@@ -96,6 +97,7 @@
                         >
                           <q-date
                             v-model="deliveryDate"
+                            @input="selectedPeriod"
                             dark
                             :locale="myLocale"
                             mask=DD/MM/YYYY
@@ -124,6 +126,8 @@
                 >
                   <q-option-group
                     v-model="period"
+                    dark
+                    @input="selectedPeriod"
                     :options="[
                         {label: 'Manhã', value: 'MANHÃ'},
                         {label: 'Tarde', value: 'TARDE'},
@@ -141,17 +145,58 @@
 
       <q-step
         :name="3"
-        title="Ad template"
-        icon="assignment"
-        disable
+        title="Pagamento"
+        icon="fas fa-money-check-alt"
       >
-        This step won't show up because it is disabled.
+        <div class="row justiy-between">
+          <div
+            class="text-caption"
+            v-if="step>1"
+          >{{costumer.pay_method.payment_description}}</div>
+        </div>
+        <div class="row items-baseline">
+          <div class="col-3">
+            <div class="text-caption q-mt-sm">Nota Fiscal:</div>
+          </div>
+          <div class="col-2">
+            <q-toggle
+              dense
+              dark
+              size="xs"
+              ref="nf"
+              v-model="nf"
+              color="teal"
+              :false-value="false"
+              :true-value="true"
+              checked-icon="check"
+              unchecked-icon="clear"
+            />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <payment-methods
+              :getPayment="pamsg"
+              @paymentMethod="paymentMethod"
+            ></payment-methods>
+          </div>
+        </div>
       </q-step>
 
       <q-step
         :name="4"
-        title="Create an ad"
-        icon="add_comment"
+        title="Produtos"
+        icon="fas fa-dolly"
+      >
+        Try out different ad text to see what brings in the most customers, and learn how to
+        enhance your ads using features like ad extensions. If you run into any problems with
+        your ads, find out how to tell if they're running and how to resolve approval issues.
+      </q-step>
+
+      <q-step
+        :name="5"
+        title="Observações"
+        icon="far fa-comment-alt"
       >
         Try out different ad text to see what brings in the most customers, and learn how to
         enhance your ads using features like ad extensions. If you run into any problems with
@@ -160,16 +205,20 @@
 
       <template v-slot:navigation>
         <div class="row justify-end q-pa-md">
-          <q-btn
-            v-if="step > 1"
-            color="red-6"
-            @click="$refs.stepper.previous()"
-            :label="step > 1 ? 'Voltar' : 'Voltar'"
-            class="q-ma-sm"
-          />
+          <q-stepper-navigation>
+            <q-btn
+              v-if="step > 1"
+              color="red-5"
+              push
+              @click="$refs.stepper.previous()"
+              :label="step > 1 ? 'Voltar' : 'Voltar'"
+              class="q-ma-sm"
+            />
+          </q-stepper-navigation>
           <q-stepper-navigation>
             <q-btn
               @click="nextStep"
+              push
               color="primary"
               :label="step === 4 ? 'Finish' : 'Continue'"
               class="q-ma-sm"
@@ -185,19 +234,25 @@
 import apiClient from 'src/services/api'
 import EventBus from 'src/boot/EventBus'
 import moment from 'moment'
+import PaymentMethods from './PaymentMethods.vue'
 
 export default {
+  components: { PaymentMethods },
   name: 'PreSellSteper',
   data () {
     return {
       step: 1,
       costumers: [],
+      costumer: [],
       address: [],
       selectedAddress: '',
       filter: '',
-      deliveryDate: moment().format('DD/MM/YYYY'),
+      nf: false,
+      pamsg: 0,
+      deliveryDate: moment().add(1, 'days').format('DD/MM/YYYY'),
       period: '',
       controlCostumer: false,
+      controlAddress: false,
       columns: [
         { name: 'register_number', label: 'CNPJ / CPF', align: 'center', field: 'register_number' },
         { name: 'company_name', align: 'left', label: 'Nome Fantasia', field: 'company_name', sortable: true },
@@ -246,24 +301,41 @@ export default {
   },
   methods: {
     selectedPeriod (value) {
-      console.log(this.address[value].period)
-      this.period = this.address[value].period
-      EventBus.$emit('address', this.address[value])
+      const index = this.selectedAddress
+      if (this.period) {
+        this.address[index].period = this.period
+      } else {
+        this.period = this.address[index].period
+      }
+      if (this.deliveryDate) {
+        this.address[index].deliveryDate = this.deliveryDate
+      } else {
+        this.deliveryDate = this.address[index].deliveryDate
+      }
+      EventBus.$emit('address', this.address[index])
+      this.controlAddress = true
     },
     addressPopulator (element, index) {
-      console.log(element, index)
+      // console.log(element, index)
       this.address.push(
         {
           label: element.city + ' - ' + element.street,
           value: index,
           id: element.id,
-          period: element.preference_period
+          period: element.preference_period,
+          deliveryDate: ''
         }
       )
     },
     selectCostumer (evt, row) {
       this.controlCostumer = true
-      console.log(row.register[0].address)
+      this.costumer = row.register[0]
+      if (this.costumer.account.nf === '1') {
+        this.nf = true
+      } else {
+        this.nf = false
+      }
+
       this.address = []
       row.register[0].address.forEach(this.addressPopulator)
 
@@ -271,16 +343,35 @@ export default {
       //                   :val="location.id"
       EventBus.$emit('costumer', row)
     },
+    paymentMethod (data) {
+      console.log(data)
+    },
     nextStep () {
-      if (this.controlCostumer === true) {
+      if (this.step === 1) {
+        if (this.controlCostumer === true) {
+          this.$refs.stepper.next()
+        } else {
+          this.$q.notify({
+            color: 'red-6',
+            icon: 'check',
+            message: 'Necessita selecionar um cliente para prosseguir',
+            position: 'bottom'
+          })
+        }
+      } else if (this.step === 2) {
+        if (this.controlAddress === true) {
+          this.$refs.stepper.next()
+        } else {
+          this.$q.notify({
+            color: 'red-6',
+            icon: 'check',
+            message: 'Necessita selecionar um endereço para prosseguir',
+            position: 'bottom'
+          })
+        }
+      } else if (this.step === 3) {
+        this.pamsg++
         this.$refs.stepper.next()
-      } else {
-        this.$q.notify({
-          color: 'red-6',
-          icon: 'check',
-          message: 'Necessita selecionar um cliente para prosseguir',
-          position: 'bottom'
-        })
       }
     }
   }

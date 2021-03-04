@@ -33,7 +33,19 @@
                   <div class="col-3 q-ml-md">
                     <q-card dark>
                       <q-card-section>
-                        <div class="text-h5">Pré-Venda</div>
+                        <div class="row items-baseline">
+                          <div class="col">
+                            <div class="text-h5">Pré-Venda</div>
+                          </div>
+                          <div class="col">
+                            <q-input
+                              dense
+                              dark
+                              v-model="presell.deliveryDate"
+                              label="Data da Entrega"
+                            />
+                          </div>
+                        </div>
                       </q-card-section>
                       <q-separator
                         color="white"
@@ -96,7 +108,8 @@ export default {
         costumer: [],
         address: [],
         addressId: '',
-        deliveryPeriod: ''
+        deliveryPeriod: '',
+        deliveryDate: ''
 
       },
       costumer: []
@@ -110,6 +123,7 @@ export default {
       this.presell.address = data.label
       this.presell.addressId = data.id
       this.presell.deliveryPeriod = data.period
+      this.presell.deliveryDate = data.deliveryDate
     }
   },
   created () {
