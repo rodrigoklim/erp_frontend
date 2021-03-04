@@ -147,11 +147,12 @@
         :name="3"
         title="Pagamento"
         icon="fas fa-money-check-alt"
+        :done="step > 3"
       >
         <div class="row justiy-between">
           <div
             class="text-caption"
-            v-if="step>1"
+            v-if="step > 1"
           >{{costumer.pay_method.payment_description}}</div>
         </div>
         <div class="row items-baseline">
@@ -181,10 +182,19 @@
             ></payment-methods>
           </div>
         </div>
+        <div class="row justify-end">
+          <q-btn
+            @click="pamsg++"
+            push
+            color="orange-8"
+            label="Alterar Forma de Pagamento"
+          />
+        </div>
       </q-step>
 
       <q-step
         :name="4"
+        :done="step > 4"
         title="Produtos"
         icon="fas fa-dolly"
       >
@@ -195,6 +205,7 @@
 
       <q-step
         :name="5"
+        :done="step > 5"
         title="Observações"
         icon="far fa-comment-alt"
       >
@@ -220,7 +231,7 @@
               @click="nextStep"
               push
               color="primary"
-              :label="step === 4 ? 'Finish' : 'Continue'"
+              :label="step === 5 ? 'Terminar' : 'Continue'"
               class="q-ma-sm"
             />
           </q-stepper-navigation>
@@ -343,8 +354,37 @@ export default {
       //                   :val="location.id"
       EventBus.$emit('costumer', row)
     },
-    paymentMethod (data) {
-      console.log(data)
+    paymentMethod (payData) {
+      console.log(payData)
+      // const self = this
+      const url = '/costumer/payment'
+      const data = {
+        params: payData
+      }
+      const config = {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.token
+        }
+      }
+      apiClient.post(url, data, config).then(response => {
+        console.log(response.data)
+      }).catch(error => {
+        if (error.response) {
+          this.handleError()
+          this.submitting = false
+          console.log(error.response.data)
+          console.log(error.response.status)
+          console.log(error.response.headers)
+        } else if (error.request) {
+          this.handleError()
+          this.submitting = false
+          console.log(error.request)
+        } else {
+          // Something happened in setting up the request and triggered an Error
+          this.handleError()
+          console.log('Error', error.message)
+        }
+      })
     },
     nextStep () {
       if (this.step === 1) {
@@ -370,7 +410,6 @@ export default {
           })
         }
       } else if (this.step === 3) {
-        this.pamsg++
         this.$refs.stepper.next()
       }
     }

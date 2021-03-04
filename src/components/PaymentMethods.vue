@@ -93,40 +93,46 @@
             </div>
             <br>
             <div v-if="credit.method == 'bankSlip'">
-              <div class="row">
-                <div class="col">
-                  <div
-                    class="text q-mt-sm q-ml-sm q-mb-sm"
-                    style="font-weight: 300; font-size: 1.1rem"
-                  >Prazo para Pagamento:</div>
-                </div>
-              </div>
-              <div class="row fit justify-start items-center content-start">
-                <div class="col">
-                  <input-tag
-                    v-model="bankSlipTerm"
-                    placeholder="Separe os dias com vírgula"
-                  >
-                  </input-tag>
+              <div class="row fit justify-start items-center content-start q-mt-lg">
+                <div class="row fit justify-start items-center content-start">
+                  <div class="col">
+                    <q-select
+                      label="Prazo Para Pagamento:"
+                      outlined
+                      dark
+                      v-model="bankSlipTerm"
+                      hint="Separe os dias apertando o Enter após a digitação."
+                      use-input
+                      use-chips
+                      multiple
+                      :rules="[val => !!val || 'Campo obrigatório.']"
+                      hide-dropdown-icon
+                      input-debounce="0"
+                      new-value-mode="add"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
             <div v-if="credit.method == 'check'">
-              <div class="row">
-                <div class="col">
-                  <div
-                    class="text q-mt-sm q-ml-sm q-mb-sm"
-                    style="font-weight: 300; font-size: 1.1rem"
-                  >Prazo para Pagamento:</div>
-                </div>
-              </div>
-              <div class="row fit justify-start items-center content-start">
-                <div class="col">
-                  <input-tag
-                    v-model="checkTerm"
-                    placeholder="Separe os dias com vírgula"
-                  >
-                  </input-tag>
+              <div class="row fit justify-start items-center content-start q-mt-lg">
+                <div class="row fit justify-start items-center content-start">
+                  <div class="col">
+                    <q-select
+                      label="Prazo Para Pagamento:"
+                      outlined
+                      dark
+                      v-model="checkTerm"
+                      hint="Separe os dias apertando o Enter após a digitação."
+                      use-input
+                      use-chips
+                      multiple
+                      :rules="[val => !!val || 'Campo obrigatório.']"
+                      hide-dropdown-icon
+                      input-debounce="0"
+                      new-value-mode="add"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -148,22 +154,23 @@
                       </div>
                     </div>
                   </div>
-                  <div class="row fit justify-start items-center content-start">
-                    <div class="row">
-                      <div class="col">
-                        <div
-                          class="text q-mt-md q-mb-sm"
-                          style="font-weight: 300; font-size: 1.1rem"
-                        >Prazo para Pagamento:</div>
-                      </div>
-                    </div>
+                  <div class="row fit justify-start items-center content-start q-mt-lg">
                     <div class="row fit justify-start items-center content-start">
                       <div class="col">
-                        <input-tag
+                        <q-select
+                          label="Prazo Para Pagamento:"
+                          outlined
+                          dark
                           v-model="bankTransfer.term"
-                          placeholder="Separe os dias com vírgula"
-                        >
-                        </input-tag>
+                          hint="Separe os dias apertando o Enter após a digitação."
+                          use-input
+                          use-chips
+                          multiple
+                          :rules="[val => !!val || 'Campo obrigatório.']"
+                          hide-dropdown-icon
+                          input-debounce="0"
+                          new-value-mode="add"
+                        />
                       </div>
                     </div>
                   </div>
