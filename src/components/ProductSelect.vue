@@ -268,62 +268,18 @@
                     :props="props"
                   >
                     {{ props.row.price }}
-                    <q-popup-edit
-                      v-model="props.row.price"
-                      title="Editar Valor"
-                      buttons
-                      persistent
-                      style="color:white; opacity: 0.75"
-                    >
-                      <q-input
-                        type="text"
-                        mask="R$ #,##"
-                        fill-mask="0"
-                        reverse-fill-mask
-                        v-model="props.row.price"
-                        dense
-                        autofocus
-                        dark
-                      />
-                    </q-popup-edit>
                   </q-td>
                   <q-td
                     key="interval"
                     :props="props"
                   >
                     {{ props.row.interval }}
-                    <q-popup-edit
-                      v-model="props.row.interval"
-                      title="Editar Valor"
-                      buttons
-                      persistent
-                    >
-                      <q-input
-                        type="text"
-                        v-model="props.row.interval"
-                        dense
-                        autofocus
-                      />
-                    </q-popup-edit>
                   </q-td>
                   <q-td
                     key="exactDay"
                     :props="props"
                   >
                     {{ props.row.exactDay }}
-                    <q-popup-edit
-                      v-model="props.row.exactDay"
-                      title="Editar Valor"
-                      buttons
-                      persistent
-                    >
-                      <q-input
-                        type="text"
-                        v-model="props.row.exactDay"
-                        dense
-                        autofocus
-                      />
-                    </q-popup-edit>
                   </q-td>
                   <q-td
                     key="editRow"
@@ -403,14 +359,15 @@ export default {
     apiClient.get(url, data).then(response => {
       Object.keys(response.data).forEach((key) => {
         var category = response.data[key].category.toUpperCase()
-        var product = response.data[key].product.toUpperCase()
+        var product = category + ' | ' + response.data[key].product.toUpperCase()
 
         self.productList.push({
           value: key,
-          label: category + ' | ' + product,
+          label: product,
           disable: false
         })
       })
+
       this.products = response.data
       this.edit()
     }).catch(error => {
@@ -467,14 +424,16 @@ export default {
             const price = pList[key].max_price * p[k].price
             self.data.push({
               id: p[k].products_id,
-              product: pList[key].product,
-              price: price.toFixed(2),
+              product: pList[key].category.toUpperCase() + ' | ' + pList[key].product,
+              price: 'R$ ' + price.toFixed(2),
               interval: p[k].interval,
               exactDay: p[k].exact_day
             })
+            this.productList[key].disable = true
           }
         })
       })
+
       this.$forceUpdate()
     },
     deleteProduct (i) {

@@ -91,31 +91,51 @@
                           :rules="[val => !!val || 'Campo obrigatório.']"
                         />
                       </q-card-section>
-                      <q-card-section>
-                        <div class="row">
-                          <div class="col-8">
-                            <div
-                              class="text"
-                              style="font-weight: 300; font-size:17px; opacity: 0.75"
-                            >Nota Fiscal: </div>
-                          </div>
-                          <div class="col-4 self-start">
-                            <div v-if="presell.nf === true">
-                              <q-icon
-                                name="check_circle_outlined"
-                                color="teal"
-                                size="sm"
-                              />
-                            </div>
-                            <div v-else-if="presell.nf === false">
-                              <q-icon
-                                name="highlight_off"
-                                color="red-6"
-                                size="sm"
-                              />
-                            </div>
-                          </div>
-                        </div>
+                      <q-card-section class="q-pa-none q-ma-none">
+                        <q-input
+                          outlined
+                          label="Nota Fiscal"
+                          dark
+                          class="text-uppercase q-pa-sm q-ma-none"
+                        >
+                          <template
+                            v-slot:append
+                            v-if="presell.nf === true"
+                            class="mr-lg"
+                          >
+                            <q-icon
+                              name="check_circle_outlined"
+                              color="teal"
+                              size="sm"
+                            />
+                          </template>
+                          <template
+                            v-slot:append
+                            v-else-if="presell.nf === false"
+                            class="mr-lg"
+                          >
+                            <q-icon
+                              name="highlight_off"
+                              color="red-6"
+                              size="sm"
+                            />
+                          </template>
+                        </q-input>
+                      </q-card-section>
+                      <q-card-section class="q-pa-sm q-ma-none">
+                        <q-list
+                          dark
+                          bordered
+                          style="border-radius:0.25em; border-width: 2px"
+                          class="text-uppercase"
+                        >
+                          <q-item
+                            v-for="(product, index) in presell.products"
+                            :key="index"
+                          >
+                            <q-item-section>{{(index+1) +'. '+ product.product}}</q-item-section>
+                          </q-item>
+                        </q-list>
                       </q-card-section>
                     </q-card>
                   </div>
@@ -134,6 +154,7 @@
 <script>
 import PreSellSteper from 'src/components/PreSellSteper.vue'
 import EventBus from 'src/boot/EventBus'
+import apiClient from 'src/services/api'
 
 export default {
   components: { PreSellSteper },
@@ -147,7 +168,9 @@ export default {
         deliveryPeriod: '',
         deliveryDate: '',
         payment: '',
-        nf: ''
+        nf: '',
+        products: [],
+        observation: []
       },
       costumer: []
     }
@@ -165,6 +188,45 @@ export default {
     updatePayment (data) {
       this.presell.payment = data[0]
       this.presell.nf = data[1]
+    },
+    updateProducts (data) {
+      this.presell.products = data
+    },
+    updateObservation (data) {
+      this.presell.observation = data
+    },
+    submit () {
+      const url = '/presell/create'
+      const config = {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.token
+        }
+      }
+      const data = {
+        params: this.presell
+      }
+      apiClient.post(url, data, config).then(response => {
+        console.log(response.data)
+        if (response.data === 'ok') {
+        }
+        this.obs = !this.obs
+      }).catch(error => {
+        if (error.response) {
+          this.handleError()
+          this.submitting = false
+          console.log(error.response.data)
+          console.log(error.response.status)
+          console.log(error.response.headers)
+        } else if (error.request) {
+          this.handleError()
+          this.submitting = false
+          console.log(error.request)
+        } else {
+          // Something happened in setting up the request and triggered an Error
+          this.handleError()
+          console.log('Error', error.message)
+        }
+      })
     }
   },
   created () {
@@ -176,6 +238,15 @@ export default {
     })
     EventBus.$on('presellPayment', (data) => {
       this.updatePayment(data)
+    })
+    EventBus.$on('presellProducts', (data) => {
+      this.updateProducts(data)
+    })
+    EventBus.$on('presellObservation', (data) => {
+      this.updateObservation(data)
+    })
+    EventBus.$on('submit', (data) => {
+      this.submit(data)
     })
   }
 }

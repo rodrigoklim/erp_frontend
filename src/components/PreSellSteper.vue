@@ -39,6 +39,42 @@
               </template>
             </q-input>
           </template>
+
+          <template v-slot:body-cell-flag="props">
+            <q-td :props="props">
+              <q-icon
+                v-if="props.row.register[0].account.financial_flag == 1"
+                name="fas fa-exclamation-circle"
+                color="red-6"
+                size="sm"
+                class="q-mr-sm"
+              >
+                <q-tooltip
+                  content-class="bg-grey"
+                  :offset="[10, 10]"
+                  anchor="center left"
+                >
+                  Bloqueio Financeiro
+                </q-tooltip>
+                <div @loadeddata="console.log(props)"></div>
+              </q-icon>
+              <q-icon
+                v-if="props.row.register[0].account.remittance_flag == 1"
+                name="fas fa-exclamation-triangle"
+                color="yellow-9"
+                size="sm"
+              />
+              <q-tooltip
+                content-class="bg-grey"
+                :delay="800"
+                anchor="center right"
+                :offset="[10, 10]"
+              >
+                Alerta de Itens no Cliente
+              </q-tooltip>
+            </q-td>
+          </template>
+
         </q-table>
       </q-step>
       <q-step
@@ -198,9 +234,11 @@
         title="Produtos"
         icon="fas fa-dolly"
       >
-        Try out different ad text to see what brings in the most customers, and learn how to
-        enhance your ads using features like ad extensions. If you run into any problems with
-        your ads, find out how to tell if they're running and how to resolve approval issues.
+        <product-select
+          :editProducts="editProducts"
+          :submitProduct="pmsg"
+          @productPicked="productPicked"
+        ></product-select>
       </q-step>
 
       <q-step
@@ -209,9 +247,10 @@
         title="Observações"
         icon="far fa-comment-alt"
       >
-        Try out different ad text to see what brings in the most customers, and learn how to
-        enhance your ads using features like ad extensions. If you run into any problems with
-        your ads, find out how to tell if they're running and how to resolve approval issues.
+        <order-observations
+          @observations="observations"
+          :submitObservations="obsmsg"
+        ></order-observations>
       </q-step>
 
       <template v-slot:navigation>
@@ -246,9 +285,11 @@ import apiClient from 'src/services/api'
 import EventBus from 'src/boot/EventBus'
 import moment from 'moment'
 import PaymentMethods from './PaymentMethods.vue'
+import ProductSelect from './ProductSelect.vue'
+import OrderObservations from './OrderObservations.vue'
 
 export default {
-  components: { PaymentMethods },
+  components: { PaymentMethods, ProductSelect, OrderObservations },
   name: 'PreSellSteper',
   data () {
     return {
@@ -265,11 +306,14 @@ export default {
       period: '',
       controlCostumer: false,
       controlAddress: false,
+      editProducts: [],
+      pmsg: 0,
       columns: [
         { name: 'register_number', label: 'CNPJ / CPF', align: 'center', field: 'register_number' },
         { name: 'company_name', align: 'left', label: 'Nome Fantasia', field: 'company_name', sortable: true },
         { name: 'contact', align: 'center', label: 'Contato', field: 'contact', sortable: true },
-        { name: 'zone', align: 'center', label: 'Região', field: 'zone', sortable: true }
+        { name: 'zone', align: 'center', label: 'Região', field: 'zone', sortable: true },
+        { name: 'flag', align: 'center', label: 'Sinalização', field: 'flag', sortable: true }
       ],
       myLocale: {
         /* starting with Sunday */
@@ -278,7 +322,9 @@ export default {
         months: 'Janeiro_Fevereiro_Mar;o_Abril_Maio_Junho_Julho_Agosto_Setembro_Outubro_Novembro_Dezembro'.split('_'),
         monthsShort: 'Jab_Fev_Mar_Abr_Mai_Jun_Jul_Ago_Set_Out_Nov_Dec'.split('_'),
         firstDayOfWeek: 1
-      }
+      },
+      observations: '',
+      obsmsg: 0
     }
   },
   mounted () {
@@ -340,20 +386,24 @@ export default {
       )
     },
     selectCostumer (evt, row) {
-      this.controlCostumer = true
-      this.costumer = row.register[0]
-      if (this.costumer.account.nf === '1') {
-        this.nf = true
-      } else {
-        this.nf = false
+      if (row.register[0].account.financial_flag !== '1') {
+        this.controlCostumer = true
+        this.costumer = row.register[0]
+        this.editProducts = row.register[0].products
+
+        if (this.costumer.account.nf === '1') {
+          this.nf = true
+        } else {
+          this.nf = false
+        }
+
+        this.address = []
+        row.register[0].address.forEach(this.addressPopulator)
+
+        //   row.register[0].address :label="location.city +' - ' + location.street"
+        //                   :val="location.id"
+        EventBus.$emit('costumer', row)
       }
-
-      this.address = []
-      row.register[0].address.forEach(this.addressPopulator)
-
-      //   row.register[0].address :label="location.city +' - ' + location.street"
-      //                   :val="location.id"
-      EventBus.$emit('costumer', row)
     },
     paymentMethod (payData) {
       // const self = this
@@ -386,6 +436,9 @@ export default {
         }
       })
     },
+    productPicked (data) {
+      EventBus.$emit('presellProducts', data)
+    },
     nextStep () {
       if (this.step === 1) {
         if (this.controlCostumer === true) {
@@ -410,33 +463,38 @@ export default {
           })
         }
       } else if (this.step === 3) {
-        console.log(this.payment.length)
         if (this.payment.length === 0) {
           EventBus.$emit('presellPayment', [this.costumer.pay_method, this.nf])
         } else {
           EventBus.$emit('presellPayment', [this.payment, this.nf])
         }
         this.$refs.stepper.next()
+      } else if (this.step === 4) {
+        this.pmsg++
+        const self = this
+
+        localStorage.costumer = JSON.stringify(this.costumer)
+        setTimeout(function () {
+          self.$refs.stepper.next()
+        }, 800)
+      } else if (this.step === 5) {
+        this.obsmsg++
+        this.$q.notify({
+          message: 'Deseja finalizar a Pré-Venda?',
+          color: 'teal',
+          actions: [
+            { label: 'Fechar', color: 'red', handler: () => { } },
+            { label: 'Enviar', color: 'white', handler: () => { EventBus.$emit('submit', 'oi') } }
+          ]
+        })
       }
     }
   }
-  //   methods: {
-  //     costumerDetails (evt, row, index) {
-  //       this.company_name = row.company_name
-  //       // this.address = row.register[0].address[0].street + ', ' + row.register[0].address[0].number + ', ' + row.register[0].address[0].complement + ', ' + row.register[0].address[0].city + ' - ' + row.register[0].address[0].state
-  //       this.phone_1 = row.register[0].phone_1
-  //       if (row.register[0].phone_1zap) {
-  //         const phone = row.register[0].phone_1
-  //         const user = localStorage.name
-  //         this.zap = true
-  //         this.link = 'https://api.whatsapp.com/send?phone=55' + phone + '&text=Oi%2C%20aqui%20%C3%A9%20' + user + '%20da%20Criomec%2C%20tudo%20bem%3F'
-  //       }
-  //       this.pay_method = row.register[0].pay_method.payment_description
-  //       this.costumer = row
-  //     }
-  //   }
 }
 </script>
 
 <style>
+.q-input .text-negative {
+  color: tomato !important;
+}
 </style>
