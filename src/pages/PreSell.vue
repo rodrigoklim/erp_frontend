@@ -163,6 +163,7 @@ export default {
     return {
       presell: {
         costumer: [],
+        c_id: '',
         address: [],
         addressId: '',
         deliveryPeriod: '',
@@ -172,12 +173,14 @@ export default {
         products: [],
         observation: []
       },
-      costumer: []
+      costumer: [],
+      control: 0
     }
   },
   methods: {
     updateCostumer (row) {
       this.presell.costumer = row.company_name
+      this.presell.c_id = row.c_id
     },
     updateAddress (data) {
       this.presell.address = data.label
@@ -188,6 +191,11 @@ export default {
     updatePayment (data) {
       this.presell.payment = data[0]
       this.presell.nf = data[1]
+      if (this.presell.payment.payment_code === 33) {
+        localStorage.payCode = true
+      } else {
+        localStorage.payCode = false
+      }
     },
     updateProducts (data) {
       this.presell.products = data
@@ -208,6 +216,14 @@ export default {
       apiClient.post(url, data, config).then(response => {
         console.log(response.data)
         if (response.data === 'ok') {
+          this.$router.push('/', () => {
+            this.$q.notify({
+              color: 'teal',
+              icon: 'check',
+              message: 'Prevenda Cadastrada com sucesso!',
+              position: 'top-right'
+            })
+          })
         }
         this.obs = !this.obs
       }).catch(error => {
@@ -246,8 +262,12 @@ export default {
       this.updateObservation(data)
     })
     EventBus.$on('submit', (data) => {
-      this.submit(data)
+      if (this.control !== data) {
+        this.control++
+        this.submit()
+      }
     })
+    localStorage.payCode = false
   }
 }
 </script>

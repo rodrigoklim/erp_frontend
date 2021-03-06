@@ -1,12 +1,27 @@
 <template>
   <div class="orderObservations">
     <div class="row">
-      <q-btn
-        icon="fas fa-plus"
-        color="orange-8"
-        label="Criar nova Observação"
-        @click="obs = !obs"
-      />
+      <div class="col-6 q-pr-sm">
+        <q-btn
+          icon="fas fa-plus"
+          color="orange-8"
+          label="Criar nova Observação"
+          @click="obs = !obs"
+        />
+      </div>
+      <div
+        class="col-6 q-pl-sm"
+        v-if="bankTerm === 'true'"
+      >
+        <q-input
+          outlined
+          dark
+          :rules="[val => !!val || 'Campo obrigatório.']"
+          label="Número de Empenho"
+          v-model="submitObs.commitment"
+        />
+      </div>
+
     </div>
     <div
       class="row"
@@ -172,8 +187,10 @@ export default {
       submitting: false,
       submitObs: {
         invoice: '',
-        driver: ''
-      }
+        driver: '',
+        commitment: ''
+      },
+      bankTerm: ''
     }
   },
   methods: {
@@ -250,6 +267,8 @@ export default {
         })
       }
     })
+    console.log(localStorage.payCode)
+    this.bankTerm = localStorage.payCode
   },
   watch: {
     submitObservations: function () {

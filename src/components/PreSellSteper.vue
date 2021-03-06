@@ -308,6 +308,7 @@ export default {
       controlAddress: false,
       editProducts: [],
       pmsg: 0,
+      submitControl: 0,
       columns: [
         { name: 'register_number', label: 'CNPJ / CPF', align: 'center', field: 'register_number' },
         { name: 'company_name', align: 'left', label: 'Nome Fantasia', field: 'company_name', sortable: true },
@@ -484,10 +485,13 @@ export default {
           color: 'teal',
           actions: [
             { label: 'Fechar', color: 'red', handler: () => { } },
-            { label: 'Enviar', color: 'white', handler: () => { EventBus.$emit('submit', 'oi') } }
+            { label: 'Enviar', color: 'white', handler: () => { this.handleSubmit() } }
           ]
         })
       }
+    },
+    handleSubmit () {
+      EventBus.$emit('submit', this.submitControl++)
     }
   }
 }
