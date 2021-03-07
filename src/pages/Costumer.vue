@@ -36,12 +36,7 @@
             inset
           />
           <q-card-section>
-            <q-tab-panels
-              v-model="tab"
-              animated
-              transition-prev="flip-up"
-              transition-next="flip-down"
-            >
+            <q-tab-panels v-model="tab">
               <q-tab-panel
                 dark
                 name='edit'
