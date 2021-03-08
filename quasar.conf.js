@@ -23,7 +23,8 @@ module.exports = function (/* ctx */) {
       'axios',
       'addressbar-color',
       'routeguard',
-      'EventBus'
+      'EventBus',
+      'leaflet'
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css

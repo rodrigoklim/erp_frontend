@@ -180,6 +180,7 @@ export default {
     },
     createRoute () {
       console.log(this.val)
+      this.$router.push('/nova/rota')
     }
   },
   mounted () {
@@ -209,15 +210,6 @@ export default {
         console.log('Error', error.message)
       }
     })
-  },
-  computed: {
-    // convert the events into a map of lists keyed by date
-    eventsMap () {
-      console.log('ol')
-      const map = {}
-      this.events.forEach((event) => (map[event.date] = map[event.date] || []).push(event))
-      return map
-    }
   }
 }
 </script>
