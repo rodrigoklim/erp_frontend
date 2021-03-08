@@ -6,7 +6,7 @@
           <q-card
             dark
             class="full-width"
-            style="border-radius: 2em; overflow: inherit !important; color:white; opacity:0.75; font-family: poppins; font-weight: 200"
+            style="border-radius: 2em; overflow: inherit !important; color:white; opacity:0.75; font-family: poppins; font-weight: 300"
           >
             <q-card-section>
               <div class="row">
@@ -22,15 +22,19 @@
               dark
               inset
             />
-            <div class="row justify-center">
-              <div class="col-11 q-pa-none">
+            <div class="row justify-center items-start q-pa-sm">
+              <div class="col-10 q-pa-none">
                 <q-calendar
+                  ref="calendar"
                   v-model="selectedDate"
                   view="week-agenda"
                   dark
                   locale="pt-br"
                   no-scroll
                   bordered
+                  animated
+                  transition-prev="slide-right"
+                  transition-next="slide-left"
                   class="q-pa-sm"
                   style="min-height: 500px;"
                 >
@@ -49,16 +53,92 @@
                           :class="event.color"
                           :key="index"
                         >
-                          <q-card-section>
-                            <strong>{{ event.label }}</strong>
-                          </q-card-section>
+                          <div class="row">
+                            <div class="col-2 q-mt-none items-start">
+                              <q-checkbox
+                                v-model="val"
+                                :val="event"
+                                color:white
+                              ></q-checkbox>
+                            </div>
+                            <div
+                              class="col-8 q-ml-md q-mt-none items-start"
+                              style="font-size:14px"
+                            >
+                              <strong>{{ event.label }}</strong>
+                              <div class="row">
+                                <div
+                                  class="text q-mb-none q-mt-none"
+                                  style="font-size:12px; font-weight: 500; color:black"
+                                >{{event.zone}}</div>
+                              </div>
+                            </div>
+                          </div>
                         </q-card>
-
                       </div>
                     </template>
                   </template>
                 </q-calendar>
+                <div class="row justify-center items-center">
+                  <q-btn
+                    flat
+                    label="Anterior"
+                    icon="keyboard_arrow_left"
+                    @click="calendarPrev"
+                  />
+                  <q-separator vertical />
+                  <q-btn
+                    flat
+                    label="Próximo"
+                    icon-right="keyboard_arrow_right"
+                    @click="calendarNext"
+                  />
+                </div>
               </div>
+              <div class="col-2 q-pt-sm">
+                <div class="row justify-start">
+                  Legendas:
+                </div>
+                <q-separator color="white" />
+                <div class="row justify-start items-center q-pt-md q-pb-md">
+                  <div class="col-4">
+                    <q-btn
+                      color="accent"
+                      size="sm"
+                    />
+                  </div>
+                  <div class="col-8 q-pr-lg">
+                    <div>Pedidos Recorrentes</div>
+                  </div>
+                </div>
+                <q-separator
+                  color="white"
+                  inset
+                  style="opacity:0.7"
+                />
+                <div class="row justify-start items-center q-pt-md  q-pb-md">
+                  <div class="col-4">
+                    <q-btn
+                      color="red-6"
+                      size="sm"
+                    />
+                  </div>
+                  <div class="col-8 q-pr-lg">
+                    <div class="text">Pré-Vendas</div>
+                  </div>
+                </div>
+                <q-separator color="white" />
+                <div class="row justify-start q-pt-md">
+                  <q-btn
+                    color="primary"
+                    push
+                    label="Clique para Criar a Rota"
+                    v-if="val.length > 0"
+                    @click="createRoute"
+                  />
+                </div>
+              </div>
+
             </div>
           </q-card>
         </div>
@@ -91,6 +171,15 @@ export default {
         }
       })
       return event
+    },
+    calendarNext () {
+      this.$refs.calendar.next()
+    },
+    calendarPrev () {
+      this.$refs.calendar.prev()
+    },
+    createRoute () {
+      console.log(this.val)
     }
   },
   mounted () {
