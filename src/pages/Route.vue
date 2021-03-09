@@ -36,7 +36,7 @@
                   transition-prev="slide-right"
                   transition-next="slide-left"
                   class="q-pa-sm"
-                  style="min-height: 500px;"
+                  style="min-height: 550px;"
                 >
                   <template #day-body="{ timestamp }">
                     <template
@@ -179,8 +179,8 @@ export default {
       this.$refs.calendar.prev()
     },
     createRoute () {
-      console.log(this.val)
-      this.$router.push('/nova/rota')
+      const value = JSON.stringify(this.val)
+      this.$router.push({ path: '/nova/rota/' + value })
     }
   },
   mounted () {
