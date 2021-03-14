@@ -180,6 +180,7 @@ export default {
     },
     createRoute () {
       const value = JSON.stringify(this.val)
+      // console.log(value)
       this.$router.push({ path: '/nova/rota/' + value })
     }
   },
@@ -191,22 +192,21 @@ export default {
       }
     }
     apiClient.get(url, data).then(response => {
-      console.log(response.data)
       this.agenda = response.data
     }).catch(error => {
       if (error.response) {
-        this.handleError()
+        // this.handleError()
         this.submitting = false
         console.log(error.response.data)
         console.log(error.response.status)
         console.log(error.response.headers)
       } else if (error.request) {
-        this.handleError()
+        // this.handleError()
         this.submitting = false
         console.log(error.request)
       } else {
         // Something happened in setting up the request and triggered an Error
-        this.handleError()
+        // this.handleError()
         console.log('Error', error.message)
       }
     })

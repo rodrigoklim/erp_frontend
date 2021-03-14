@@ -8,12 +8,55 @@
             class="full-width"
             style="border-radius: 2em; overflow: inherit !important; color:white; font-family: poppins; font-weight: 300"
           >
-            <q-card-section>
-              <div class="row">
-                <div
-                  class="text-h4"
-                  style="color: #4DA3FE; opacity:0.75"
-                >Rota</div>
+            <q-card-section class="q-ma-none q-pa-none ">
+              <div class="row items-baseline q-ml-sm q-mr-sm q-mt-">
+                <div class="col sef-start q-mt-md">
+                  <div
+                    class="text-h4 "
+                    style="color: #4DA3FE; opacity:0.75"
+                  >Rota</div>
+                </div>
+                <div class="col-2 self-end q-mt-md q-pl-md">
+                  <q-input
+                    class="text-uppercase"
+                    outlined
+                    dark
+                    dense
+                    label="Data de Entrega"
+                    v-model="deliveryDate"
+                    :rules="[val => !!val || 'Campo obrigatório.']"
+                    style="width: 100%;"
+                  >
+                    <template v-slot:append>
+                      <q-icon
+                        name="event"
+                        class="cursor-pointer"
+                      >
+                        <q-popup-proxy
+                          ref="qDateProxy"
+                          transition-show="scale"
+                          transition-hide="scale"
+                        >
+                          <q-date
+                            v-model="deliveryDate"
+                            dark
+                            :locale="myLocale"
+                            mask=DD/MM/YYYY
+                          >
+                            <div class="row items-center justify-end">
+                              <q-btn
+                                v-close-popup
+                                label="Close"
+                                color="primary"
+                                flat
+                              />
+                            </div>
+                          </q-date>
+                        </q-popup-proxy>
+                      </q-icon>
+                    </template>
+                  </q-input>
+                </div>
               </div>
             </q-card-section>
             <q-separator dark />
@@ -38,18 +81,54 @@
                               color="white"
                               inset
                             />
-                            <div
-                              v-for="(costumer, index) in costumers"
-                              :key="index"
-                            >
-                              <q-card-section>
-                                <q-card class="bg-accent">
-                                  <q-card-section>
-                                    {{costumer.label}}
-                                  </q-card-section>
-                                </q-card>
-                              </q-card-section>
-                            </div>
+                            <q-card-section>
+                              <draggable
+                                v-model="costumers"
+                                group="people"
+                                @start="drag=true"
+                                @end="drag=false"
+                              >
+                                <div
+                                  v-for="element, index in costumers"
+                                  :key="index"
+                                >
+                                  <q-expansion-item
+                                    expand-separator
+                                    :label="element.company_name"
+                                    :caption="estimatedDelivery(index)"
+                                    style="background-color: orange; color: white; border-radius: 1em"
+                                    class="q-mb-md"
+                                  >
+                                    <q-card
+                                      class="bg-orange-8"
+                                      style="border-radius: 0 0 1em 1em"
+                                    >
+                                      <q-card-section class="q-pb-none q-mb-none">
+                                        Produtos:
+                                      </q-card-section>
+                                      <q-card-section>
+                                        <div
+                                          v-for="product, i in element.products"
+                                          :key="i"
+                                        >
+                                          <q-input
+                                            outlined
+                                            dark
+                                            dense
+                                            :key="i"
+                                            :label="product.product"
+                                            v-model="product.qty"
+                                            class="q-pb-sm"
+                                            @input="sumQty(product)"
+                                          />
+                                        </div>
+
+                                      </q-card-section>
+                                    </q-card>
+                                  </q-expansion-item>
+                                </div>
+                              </draggable>
+                            </q-card-section>
 
                           </q-card>
                         </div>
@@ -68,8 +147,9 @@
                                     outlined
                                     label="Ponto Inicial"
                                     :options="origin"
-                                    emit-value
+                                    @input="travelOrigin"
                                     v-model="Lorigin"
+                                    class="text-uppercase"
                                   />
                                 </div>
                                 <div class="col self-center q-ml-sm q-mr-sm">
@@ -78,8 +158,9 @@
                                     outlined
                                     label="Ponto Final"
                                     :options="destiny"
-                                    emit-value
+                                    @input="travelEnd"
                                     v-model="Ldestiny"
+                                    class="text-uppercase"
                                   />
                                 </div>
                                 <div class="col self-end q-ml-md">
@@ -88,8 +169,8 @@
                                     outlined
                                     label="Veículo"
                                     :options="vehicle"
-                                    emit-value
                                     v-model="selectedVehicle"
+                                    class="text-uppercase"
                                   />
                                 </div>
                               </div>
@@ -108,34 +189,20 @@
                                 @update:center="centerUpdate"
                                 @update:zoom="zoomUpdate"
                               >
-                                <l-tile-layer
-                                  :url="url"
-                                  :attribution="attribution"
+                                <l-tile-layer :url="url" />
+                                <l-marker
+                                  :lat-lng="marker.value"
+                                  v-for="marker, index in markers"
+                                  :key="index"
+                                  :icon="marker.icon"
+                                >
+                                </l-marker>
+                                <l-polyline
+                                  v-for="polyline in route"
+                                  :key="polyline.index"
+                                  :lat-lngs="polyline.route"
+                                  :color="polyline.color"
                                 />
-                                <l-marker :lat-lng="withPopup">
-                                  <l-popup>
-                                    <div @click="innerClick">
-                                      I am a popup
-                                      <p v-show="showParagraph">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
-                                        sed pretium nisl, ut sagittis sapien. Sed vel sollicitudin nisi.
-                                        Donec finibus semper metus id malesuada.
-                                      </p>
-                                    </div>
-                                  </l-popup>
-                                </l-marker>
-                                <l-marker :lat-lng="withTooltip">
-                                  <l-tooltip :options="{ permanent: true, interactive: true }">
-                                    <div @click="innerClick">
-                                      I am a tooltip
-                                      <p v-show="showParagraph">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
-                                        sed pretium nisl, ut sagittis sapien. Sed vel sollicitudin nisi.
-                                        Donec finibus semper metus id malesuada.
-                                      </p>
-                                    </div>
-                                  </l-tooltip>
-                                </l-marker>
                               </l-map>
                             </q-card-section>
                           </q-card>
@@ -147,7 +214,7 @@
                     <div class="row justify-end q-pl-md q-pt-none">
                       <q-card
                         dark
-                        style="width:100%"
+                        style="width:100%;color:white; opacity:0.95; font-family: poppins; font-weight: 300;"
                       >
                         <q-card-section>
                           <div
@@ -236,6 +303,23 @@
                           <q-card-section>
                             Carregamento:
                           </q-card-section>
+                          <q-card-section>
+                            <q-list
+                              dark
+                              bordered
+                              separator
+                            >
+                              <q-item
+                                v-for="item in products_list"
+                                :key="item.id"
+                              >
+                                <q-item-section>
+                                  <q-item-label overline>{{item.product}}</q-item-label>
+                                  <q-item-label caption>{{item.qty}}</q-item-label>
+                                </q-item-section>
+                              </q-item>
+                            </q-list>
+                          </q-card-section>
                         </q-card>
                       </q-card>
                     </div>
@@ -252,8 +336,10 @@
 
 <script>
 import { latLng, Icon } from 'leaflet'
-import { LMap, LTileLayer, LMarker, LPopup, LTooltip } from 'vue2-leaflet'
+import { LMap, LTileLayer, LMarker, LPolyline } from 'vue2-leaflet'
 import { VueSvgGauge } from 'vue-svg-gauge'
+import apiClient from 'src/services/api'
+import draggable from 'vuedraggable'
 
 delete Icon.Default.prototype._getIconUrl
 Icon.Default.mergeOptions({
@@ -268,14 +354,13 @@ export default {
     LMap,
     LTileLayer,
     LMarker,
-    LPopup,
-    LTooltip,
-    VueSvgGauge
+    LPolyline,
+    VueSvgGauge,
+    draggable
   },
   data () {
     return {
       zoom: 13,
-      center: latLng(47.41322, -1.219482),
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       attribution:
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
@@ -296,7 +381,28 @@ export default {
       vehicle: [],
       load: '',
       fuel: '',
-      costumers: []
+      costumers: [],
+      deliveryDate: '',
+      myLocale: {
+        /* starting with Sunday */
+        days: 'Domingo_Segunda_Terça_Quarta_Quinta_Sexta_Sábado'.split('_'),
+        daysShort: 'Dom_Seg_Ter_Qua_Qui_Sex_Sáb'.split('_'),
+        months: 'Janeiro_Fevereiro_Mar;o_Abril_Maio_Junho_Julho_Agosto_Setembro_Outubro_Novembro_Dezembro'.split('_'),
+        monthsShort: 'Jab_Fev_Mar_Abr_Mai_Jun_Jul_Ago_Set_Out_Nov_Dec'.split('_'),
+        firstDayOfWeek: 1
+      },
+      center: [-23.5862689, -46.6830193],
+      endCoordinates: [],
+      markers: [],
+      originMarker: {},
+      list: [],
+      dragging: false,
+      products_list: [],
+      details: [],
+      route: [],
+      markersGroup: [],
+      map: ''
+
     }
   },
   methods: {
@@ -311,11 +417,103 @@ export default {
     },
     innerClick () {
       alert('Click!')
+    },
+    travelOrigin () {
+      this.markers.push({
+        label: this.Lorigin.label,
+        value: latLng(this.Lorigin.value.split(',').reverse())
+      })
+      this.center = latLng(this.Lorigin.value.split(',').reverse())
+    },
+    travelEnd () {
+      this.markers.push({
+        label: this.Ldestiny.label,
+        value: this.Ldestiny.value.split(','),
+        icon: this.defaultIcon
+      })
+      this.center = latLng(this.Ldestiny.value.split(',').reverse())
+    },
+    sumQty (product) {
+      var total = 0
+      this.costumers.forEach(function (prod) {
+        prod.products.forEach(function (p) {
+          if (p.product_id === product.product_id) {
+            total += parseInt(p.qty)
+          }
+        })
+      })
+      this.products_list.forEach(function (item) {
+        if (item.product_id === product.product_id) {
+          item.qty = total
+        }
+      })
+
+      this.$forceUpdate()
+    },
+    estimatedDelivery (i) {
+      return this.details.matrix[i].time
+    },
+    handleMarkers (data) {
+      this.markers.push({
+        value: latLng(data.pointB.split(',').reverse())
+      })
+    },
+    handlePolyline (data) {
+      const self = this
+      var path = []
+      data.matrix.forEach(function (item) {
+        self.handleMarkers(item.markers)
+        item.route.forEach(function (coords) {
+          path.push([coords[1], coords[0]])
+        })
+        self.route.push({
+          route: path,
+          color: 'purple'
+        })
+      })
     }
   },
   mounted () {
-    console.log(this.$router.currentRoute.params.props)
-    this.costumers = JSON.parse(this.$router.currentRoute.params.props)
+    const url = '/route/create/page'
+    const config = {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.token
+      }
+    }
+    const details = JSON.parse(this.$router.currentRoute.params.props)
+    const data = {
+      params: {
+        details
+      }
+    }
+
+    apiClient.post(url, data, config).then(response => {
+      console.log(response.data)
+      this.origin = response.data.origin
+      this.destiny = response.data.destiny
+      this.costumers = response.data.costumers
+      this.products_list = response.data.products
+      this.details = response.data.details
+      this.handlePolyline(this.details)
+      this.Ldestiny = this.destiny[0]
+      this.Lorigin = this.origin[1]
+    }).catch(error => {
+      if (error.response) {
+        // this.handleError()
+        this.submitting = false
+        console.log(error.response.data)
+        console.log(error.response.status)
+        console.log(error.response.headers)
+      } else if (error.request) {
+        // this.handleError()
+        this.submitting = false
+        console.log(error.request)
+      } else {
+        // Something happened in setting up the request and triggered an Error
+        // this.handleError()
+        console.log('Error', error.message)
+      }
+    })
   }
 }
 </script>
