@@ -86,7 +86,7 @@
                                 v-model="costumers"
                                 group="people"
                                 @start="drag=true"
-                                @end="drag=false"
+                                @end="updateRoute"
                               >
                                 <div
                                   v-for="element, index in costumers"
@@ -147,9 +147,10 @@
                                     outlined
                                     label="Ponto Inicial"
                                     :options="origin"
-                                    @input="travelOrigin"
+                                    @input="updateRoute"
                                     v-model="Lorigin"
                                     class="text-uppercase"
+                                    :rules="[val => !!val || 'Campo obrigatório.']"
                                   />
                                 </div>
                                 <div class="col self-center q-ml-sm q-mr-sm">
@@ -158,19 +159,23 @@
                                     outlined
                                     label="Ponto Final"
                                     :options="destiny"
-                                    @input="travelEnd"
+                                    @input="updateRoute"
                                     v-model="Ldestiny"
                                     class="text-uppercase"
+                                    :rules="[val => !!val || 'Campo obrigatório.']"
                                   />
                                 </div>
                                 <div class="col self-end q-ml-md">
                                   <q-select
+                                    ref="vehicle"
                                     dark
                                     outlined
                                     label="Veículo"
                                     :options="vehicle"
                                     v-model="selectedVehicle"
                                     class="text-uppercase"
+                                    @input="vehicleDetails"
+                                    :rules="[val => !!val || 'Campo obrigatório.']"
                                   />
                                 </div>
                               </div>
@@ -226,6 +231,21 @@
                           color="white"
                           inset
                         />
+                        <q-card-section
+                          class="q-mb-none"
+                          style="font-size: 12px; opacity: 0.75"
+                        >
+                          <div class="row">
+                            <div class="col-8">Tempo Estimado:</div>
+                            <div class="col-4">{{details.time}}</div>
+                          </div>
+                          <div class="row">
+                            <div class="col-8">Distância Total:</div>
+                            <div class="col-4">
+                              {{details.totalLength}}
+                              km</div>
+                          </div>
+                        </q-card-section>
                         <div class="row">
                           <div class="col">
                             <!-- Fuel Gauge -->
@@ -233,10 +253,10 @@
                               <VueSvgGauge
                                 :start-angle="-110"
                                 :end-angle="110"
-                                :value="3"
-                                :separator-step="1"
-                                :min="0"
-                                :max="4"
+                                :value="fuel.value"
+                                :separator-step="(parseFloat(fuel.max)/5)"
+                                :min="fuel.min"
+                                :max="fuel.max"
                                 :gauge-color="[{ offset: 0, color: '#347AB0'}, { offset: 100, color: '#8CDFAD'}]"
                                 :scale-interval="0.1"
                                 style="transform: rotate(-90deg)"
@@ -255,7 +275,7 @@
                                 dark
                                 label="Combustível"
                                 dense
-                                v-model="fuel"
+                                v-model="fuel.value"
                                 class="q-mt-md"
                               />
                             </q-card-section>
@@ -266,10 +286,10 @@
                               <VueSvgGauge
                                 :start-angle="-110"
                                 :end-angle="110"
-                                :value="3"
-                                :separator-step="1"
-                                :min="0"
-                                :max="4"
+                                :value="load.value"
+                                :separator-step="parseFloat(load.max)/5"
+                                :min="load.min"
+                                :max="load.max"
                                 :gauge-color="[{ offset: 0, color: '#347AB0'}, { offset: 100, color: '#8CDFAD'}]"
                                 :scale-interval="0.1"
                                 style="transform: rotate(-90deg)"
@@ -287,7 +307,7 @@
                                 outlined
                                 dark
                                 label="Carga"
-                                v-model="load"
+                                v-model="load.value"
                                 dense
                                 class="q-mt-md"
                               />
@@ -322,6 +342,15 @@
                           </q-card-section>
                         </q-card>
                       </q-card>
+                    </div>
+                    <div class="row justify-center q-pt-md q-pb-md">
+                      <q-btn
+                        label="Criar Rota"
+                        push
+                        color="primary"
+                        @click="submitRoute"
+                        style="width: 70%"
+                      />
                     </div>
                   </div>
                 </div>
@@ -379,30 +408,27 @@ export default {
       Lorigin: [],
       selectedVehicle: '',
       vehicle: [],
-      load: '',
-      fuel: '',
+      load: [],
+      fuel: [],
       costumers: [],
       deliveryDate: '',
       myLocale: {
         /* starting with Sunday */
         days: 'Domingo_Segunda_Terça_Quarta_Quinta_Sexta_Sábado'.split('_'),
         daysShort: 'Dom_Seg_Ter_Qua_Qui_Sex_Sáb'.split('_'),
-        months: 'Janeiro_Fevereiro_Mar;o_Abril_Maio_Junho_Julho_Agosto_Setembro_Outubro_Novembro_Dezembro'.split('_'),
+        months: 'Janeiro_Fevereiro_Março_Abril_Maio_Junho_Julho_Agosto_Setembro_Outubro_Novembro_Dezembro'.split('_'),
         monthsShort: 'Jab_Fev_Mar_Abr_Mai_Jun_Jul_Ago_Set_Out_Nov_Dec'.split('_'),
         firstDayOfWeek: 1
       },
       center: [-23.5862689, -46.6830193],
-      endCoordinates: [],
       markers: [],
-      originMarker: {},
       list: [],
       dragging: false,
       products_list: [],
       details: [],
       route: [],
       markersGroup: [],
-      map: ''
-
+      loadControl: ''
     }
   },
   methods: {
@@ -418,21 +444,6 @@ export default {
     innerClick () {
       alert('Click!')
     },
-    travelOrigin () {
-      this.markers.push({
-        label: this.Lorigin.label,
-        value: latLng(this.Lorigin.value.split(',').reverse())
-      })
-      this.center = latLng(this.Lorigin.value.split(',').reverse())
-    },
-    travelEnd () {
-      this.markers.push({
-        label: this.Ldestiny.label,
-        value: this.Ldestiny.value.split(','),
-        icon: this.defaultIcon
-      })
-      this.center = latLng(this.Ldestiny.value.split(',').reverse())
-    },
     sumQty (product) {
       var total = 0
       this.costumers.forEach(function (prod) {
@@ -447,6 +458,12 @@ export default {
           item.qty = total
         }
       })
+      if (this.loadControl === 'plus') {
+        this.load.value = parseFloat(total)
+      } else {
+        console.log(this.selectedVehicle.load.balance)
+        this.load.value = parseFloat(this.selectedVehicle.load.balance) - parseFloat(total)
+      }
 
       this.$forceUpdate()
     },
@@ -460,7 +477,12 @@ export default {
     },
     handlePolyline (data) {
       const self = this
+      this.route = []
+      this.markers = []
       var path = []
+      this.markers.push({
+        value: latLng(data.matrix[0].markers.pointA.split(',').reverse())
+      })
       data.matrix.forEach(function (item) {
         self.handleMarkers(item.markers)
         item.route.forEach(function (coords) {
@@ -470,6 +492,101 @@ export default {
           route: path,
           color: 'purple'
         })
+      })
+    },
+    updateRoute () {
+      const data = {
+        params: {
+          origin: [this.Lorigin],
+          costumers: this.costumers,
+          destiny: [this.Ldestiny]
+        }
+      }
+      const url = '/route/update'
+      const config = {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.token
+        }
+      }
+      apiClient.post(url, data, config).then(response => {
+        console.log(response.data)
+        this.details = response.data.details
+        this.handlePolyline(this.details)
+      }).catch(error => {
+        if (error.response) {
+          // this.handleError()
+          this.submitting = false
+          console.log(error.response.data)
+          console.log(error.response.status)
+          console.log(error.response.headers)
+        } else if (error.request) {
+          // this.handleError()
+          this.submitting = false
+          console.log(error.request)
+        } else {
+          // Something happened in setting up the request and triggered an Error
+          // this.handleError()
+          console.log('Error', error.message)
+        }
+      })
+    },
+    vehicleDetails (value) {
+      console.log(value)
+      this.fuel.min = 0
+      this.fuel.max = parseFloat(value.vehicle.fuel_tank)
+      this.fuel.value = parseFloat(value.fuel.balance) - (parseFloat(this.details.totalLength) / parseFloat(value.vehicle.autonomy))
+      console.log(this.vehicle)
+      if (value.load === null) {
+        console.log('null')
+        this.load.min = 0
+        this.load.value = 0
+        this.load.max = parseFloat(value.load_details.load_capacity)
+        this.loadControl = 'plus'
+      } else {
+        this.loadControl = 'minus'
+        this.load.min = 0
+        this.load.value = parseFloat(value.load.balance)
+        this.load.max = parseFloat(value.load_details.load_capacity)
+      }
+      this.$forceUpdate()
+    },
+    submitRoute () {
+      this.$refs.vehicle.validate()
+      const url = '/route/create'
+      const config = {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.token
+        }
+      }
+      const data = {
+        params: {
+          origin: this.Lorigin,
+          costumers: this.costumers,
+          destiny: this.Ldestiny,
+          vehicle: this.selectedVehicle,
+          details: this.details,
+          deliveryDate: this.deliveryDate
+        }
+      }
+
+      apiClient.post(url, data, config).then(response => {
+        console.log(response.data)
+      }).catch(error => {
+        if (error.response) {
+          // this.handleError()
+          this.submitting = false
+          console.log(error.response.data)
+          console.log(error.response.status)
+          console.log(error.response.headers)
+        } else if (error.request) {
+          // this.handleError()
+          this.submitting = false
+          console.log(error.request)
+        } else {
+          // Something happened in setting up the request and triggered an Error
+          // this.handleError()
+          console.log('Error', error.message)
+        }
       })
     }
   },
@@ -494,9 +611,10 @@ export default {
       this.costumers = response.data.costumers
       this.products_list = response.data.products
       this.details = response.data.details
+      this.vehicle = response.data.vehicles
       this.handlePolyline(this.details)
       this.Ldestiny = this.destiny[0]
-      this.Lorigin = this.origin[1]
+      this.Lorigin = this.origin[0]
     }).catch(error => {
       if (error.response) {
         // this.handleError()
@@ -519,4 +637,7 @@ export default {
 </script>
 
 <style>
+.q-input .text-negative {
+  color: tomato !important;
+}
 </style>
