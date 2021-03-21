@@ -53,7 +53,11 @@
                           :class="event.color"
                           :key="index"
                         >
-                          <div class="row">
+                          <!-- presell element -->
+                          <div
+                            class="row  q-pb-md"
+                            v-if="event.route === undefined"
+                          >
                             <div class="col-2 q-mt-none items-start">
                               <q-checkbox
                                 v-model="val"
@@ -67,10 +71,46 @@
                             >
                               <strong>{{ event.label }}</strong>
                               <div class="row">
+                                <div class="text-muted q-ma-none q-pa-none "><small>{{event.zone}}</small></div>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- route element -->
+                          <div
+                            class="row  q-pb-sm"
+                            v-else
+                          >
+                            <div class="row q-pb-sm">
+                              <div class="col-2 q-mt-none items-start">
+                                <q-checkbox
+                                  v-model="val"
+                                  :val="event"
+                                  color:white
+                                ></q-checkbox>
+                              </div>
+                              <div
+                                class="col-8 q-ml-md q-mt-none items-start"
+                                style="font-size:14px"
+                              >
+                                <div>
+                                  <div class="row q-pa-none">
+                                    <strong>Rota #{{event.route}}</strong>
+                                  </div>
+                                  <div class="row">
+                                    <div class="text-muted q-ma-none q-pa-none "><small>{{event.zone}}</small></div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div
+                              v-for="costumer, index in event.routeOrder"
+                              :key="index"
+                            >
+                              <div class="row">
                                 <div
-                                  class="text q-mb-none q-mt-none"
+                                  class="text q-ml-sm q-mb-none q-mt-none"
                                   style="font-size:12px; font-weight: 500; color:black"
-                                >{{event.zone}}</div>
+                                ><span>&#8226;</span> {{ costumer.label }}</div>
                               </div>
                             </div>
                           </div>
@@ -127,14 +167,42 @@
                     <div class="text">Pré-Vendas</div>
                   </div>
                 </div>
+                <q-separator
+                  color="white"
+                  inset
+                  style="opacity:0.7"
+                />
+                <div class="row justify-start items-center q-pt-md q-pb-md">
+                  <div class="col-4">
+                    <q-btn
+                      color="lime-10"
+                      size="sm"
+                    />
+                  </div>
+                  <div class="col-8 q-pr-lg">
+                    <div>Rotas</div>
+                  </div>
+                </div>
+
                 <q-separator color="white" />
                 <div class="row justify-start q-pt-md">
                   <q-btn
                     color="primary"
                     push
-                    label="Clique para Criar a Rota"
+                    label="Criar/Editar Rota"
                     v-if="val.length > 0"
                     @click="createRoute"
+                    style="width: 100%"
+                  />
+                </div>
+                <div class="row justify-start q-pt-md">
+                  <q-btn
+                    color="positive"
+                    push
+                    label="Encaminhar Rota"
+                    v-if="route.length > 0"
+                    @click="setRoute"
+                    style="width: 100%"
                   />
                 </div>
               </div>
@@ -155,7 +223,8 @@ export default {
     return {
       selectedDate: '',
       val: [],
-      agenda: {}
+      agenda: {},
+      route: []
     }
   },
   methods: {
@@ -182,6 +251,9 @@ export default {
       const value = JSON.stringify(this.val)
       // console.log(value)
       this.$router.push({ path: '/nova/rota/' + value })
+    },
+    setRoute () {
+      console.log(this.route)
     }
   },
   mounted () {
@@ -193,6 +265,7 @@ export default {
     }
     apiClient.get(url, data).then(response => {
       this.agenda = response.data
+      console.log(response.data)
     }).catch(error => {
       if (error.response) {
         // this.handleError()
@@ -210,6 +283,15 @@ export default {
         console.log('Error', error.message)
       }
     })
+  },
+  watch: {
+    val: function (value) {
+      if (value.length === 1 && value[0].route) {
+        this.route = value
+      } else {
+        this.route = []
+      }
+    }
   }
 }
 </script>

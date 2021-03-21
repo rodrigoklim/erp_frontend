@@ -19,6 +19,7 @@
                 <div class="col-2 self-end q-mt-md q-pl-md">
                   <q-input
                     class="text-uppercase"
+                    ref="delivery"
                     outlined
                     dark
                     dense
@@ -150,6 +151,7 @@
                                     @input="updateRoute"
                                     v-model="Lorigin"
                                     class="text-uppercase"
+                                    dense
                                     :rules="[val => !!val || 'Campo obrigatório.']"
                                   />
                                 </div>
@@ -161,6 +163,20 @@
                                     :options="destiny"
                                     @input="updateRoute"
                                     v-model="Ldestiny"
+                                    dense
+                                    class="text-uppercase"
+                                    :rules="[val => !!val || 'Campo obrigatório.']"
+                                  />
+                                </div>
+                                <div class="col self-end q-ml-md">
+                                  <q-select
+                                    ref="zone"
+                                    dark
+                                    outlined
+                                    dense
+                                    label="Região"
+                                    :options="zone"
+                                    v-model="selectedZone"
                                     class="text-uppercase"
                                     :rules="[val => !!val || 'Campo obrigatório.']"
                                   />
@@ -170,6 +186,7 @@
                                     ref="vehicle"
                                     dark
                                     outlined
+                                    dense
                                     label="Veículo"
                                     :options="vehicle"
                                     v-model="selectedVehicle"
@@ -428,7 +445,9 @@ export default {
       details: [],
       route: [],
       markersGroup: [],
-      loadControl: ''
+      loadControl: '',
+      zone: [],
+      selectedZone: ''
     }
   },
   methods: {
@@ -445,17 +464,23 @@ export default {
       alert('Click!')
     },
     sumQty (product) {
-      var total = 0
+      let total = 0
+      let totalProd = 0
       this.costumers.forEach(function (prod) {
         prod.products.forEach(function (p) {
           if (p.product_id === product.product_id) {
+            if (p.qty) {
+              totalProd += parseInt(p.qty)
+            }
+          }
+          if (p.qty) {
             total += parseInt(p.qty)
           }
         })
       })
       this.products_list.forEach(function (item) {
         if (item.product_id === product.product_id) {
-          item.qty = total
+          item.qty = totalProd
         }
       })
       if (this.loadControl === 'plus') {
@@ -548,10 +573,17 @@ export default {
         this.load.value = parseFloat(value.load.balance)
         this.load.max = parseFloat(value.load_details.load_capacity)
       }
-      this.$forceUpdate()
+    },
+    handleZoneList (value) {
+      const self = this
+      value.forEach(function (item) {
+        console.log(item.address.zone)
+        self.zone.push(item.address.zone)
+      })
     },
     submitRoute () {
       this.$refs.vehicle.validate()
+      this.$refs.delivery.validate()
       const url = '/route/create'
       const config = {
         headers: {
@@ -565,28 +597,44 @@ export default {
           destiny: this.Ldestiny,
           vehicle: this.selectedVehicle,
           details: this.details,
-          deliveryDate: this.deliveryDate
+          deliveryDate: this.deliveryDate,
+          zone: this.selectedZone,
+          load: this.load.value
         }
       }
 
       apiClient.post(url, data, config).then(response => {
         console.log(response.data)
+        // this.$router.push('/', () => {
+        //   this.$q.notify({
+        //     color: 'teal',
+        //     icon: 'check',
+        //     message: 'Rota Cadastrada com Sucesso!',
+        //     position: 'top-right'
+        //   })
+        // })
       }).catch(error => {
         if (error.response) {
-          // this.handleError()
+          this.handleError()
           this.submitting = false
           console.log(error.response.data)
           console.log(error.response.status)
           console.log(error.response.headers)
         } else if (error.request) {
-          // this.handleError()
+          this.handleError()
           this.submitting = false
           console.log(error.request)
         } else {
-          // Something happened in setting up the request and triggered an Error
-          // this.handleError()
           console.log('Error', error.message)
         }
+      })
+    },
+    handleError () {
+      this.$q.notify({
+        color: 'red-7',
+        icon: 'warning',
+        message: 'Rota não cadastrada!',
+        position: 'top-right'
       })
     }
   },
@@ -613,6 +661,7 @@ export default {
       this.details = response.data.details
       this.vehicle = response.data.vehicles
       this.handlePolyline(this.details)
+      this.handleZoneList(this.costumers)
       this.Ldestiny = this.destiny[0]
       this.Lorigin = this.origin[0]
     }).catch(error => {
@@ -638,6 +687,12 @@ export default {
 
 <style>
 .q-input .text-negative {
+  color: tomato !important;
+}
+.q-field--error .q-field__bottom {
+  color: tomato;
+}
+.text-negative {
   color: tomato !important;
 }
 </style>
