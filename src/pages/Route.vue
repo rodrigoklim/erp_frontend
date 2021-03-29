@@ -253,7 +253,8 @@ export default {
       this.$router.push({ path: '/nova/rota/' + value })
     },
     setRoute () {
-      console.log(this.route)
+      const value = this.route[0].route
+      this.$router.push({ path: '/nova/rota/checklist/carga/' + value })
     }
   },
   mounted () {

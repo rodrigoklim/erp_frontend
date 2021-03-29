@@ -203,6 +203,7 @@
                             />
                             <q-card-section>
                               <l-map
+                                ref="map"
                                 v-if="showMap"
                                 :zoom="zoom"
                                 :center="center"
@@ -213,6 +214,7 @@
                               >
                                 <l-tile-layer :url="url" />
                                 <l-marker
+                                  ref="markers"
                                   :lat-lng="marker.value"
                                   v-for="marker, index in markers"
                                   :key="index"
@@ -499,6 +501,10 @@ export default {
       this.markers.push({
         value: latLng(data.pointB.split(',').reverse())
       })
+      const map = this.$refs.map.mapObject
+      // const markers = this.$refs.markers
+      map.fitBounds(this.markers.map(m => { return [m.value.lat, m.value.lng] }))
+      this.zoom = this.currentZoom - 2
     },
     handlePolyline (data) {
       const self = this
@@ -556,13 +562,10 @@ export default {
       })
     },
     vehicleDetails (value) {
-      console.log(value)
       this.fuel.min = 0
       this.fuel.max = parseFloat(value.vehicle.fuel_tank)
       this.fuel.value = parseFloat(value.fuel.balance) - (parseFloat(this.details.totalLength) / parseFloat(value.vehicle.autonomy))
-      console.log(this.vehicle)
       if (value.load === null) {
-        console.log('null')
         this.load.min = 0
         this.load.value = 0
         this.load.max = parseFloat(value.load_details.load_capacity)
@@ -605,14 +608,14 @@ export default {
 
       apiClient.post(url, data, config).then(response => {
         console.log(response.data)
-        // this.$router.push('/', () => {
-        //   this.$q.notify({
-        //     color: 'teal',
-        //     icon: 'check',
-        //     message: 'Rota Cadastrada com Sucesso!',
-        //     position: 'top-right'
-        //   })
-        // })
+        this.$router.push('/rotas', () => {
+          this.$q.notify({
+            color: 'teal',
+            icon: 'check',
+            message: 'Rota Cadastrada com Sucesso!',
+            position: 'top-right'
+          })
+        })
       }).catch(error => {
         if (error.response) {
           this.handleError()
