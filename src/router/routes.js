@@ -11,7 +11,8 @@ const routes = [
       { path: '/pre-venda', component: () => import('pages/PreSell.vue') },
       { path: '/rotas', component: () => import('pages/Route.vue') },
       { path: '/nova/rota/:props', component: () => import('pages/CreateRoute.vue') },
-      { path: '/nova/rota/checklist/carga/:props', component: () => import('pages/ChecklistCarga.vue') }
+      { path: '/nova/rota/checklist/carga/:props', component: () => import('pages/ChecklistCarga.vue') },
+      { path: '/entregas', component: () => import('pages/DeliveryFollowUp.vue') }
     ]
   },
   {

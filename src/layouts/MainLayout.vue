@@ -39,6 +39,12 @@
               style="font-family: poppins; font-weight:70px; font-size: 20px; color:#007bff; opacity: 0.75"
             />
             <q-route-tab
+              to="/entregas"
+              label="Entregas"
+              name="deliveryFollowUp"
+              style="font-family: poppins; font-weight:70px; font-size: 20px; color:#007bff; opacity: 0.75"
+            />
+            <q-route-tab
               to="/page3"
               label="Manutenção"
               name="maintenance"
