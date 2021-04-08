@@ -15,9 +15,9 @@
           />
         </div>
         <div class="row">
-          <q-card style="font-family: poppins; font-weight:70; font-size: 20px; color:#007bff; opacity: 0.75; border-radius:1em; min-width: 400px ;background-color:#343A40; margin-top:0; ">
+          <q-card style="font-family: poppins; font-weight: 800; font-size: 20px; color:#007bff; opacity: 0.75; border-radius:1em; min-width: 400px ;background-color:#343A40; margin-top:0; ">
             <q-card-section align="center">
-              <h6 style="margin:0; padding:0">Login</h6>
+              <h6 style="margin:0; padding:0;  font-weight: 800;">Login</h6>
             </q-card-section>
             <q-form>
               <q-card-section>
@@ -122,15 +122,7 @@ export default {
       const self = this
       this.visible = true // can use this to triggle a :disabled on login button
       this.errors = null
-      // const csrf = this.getCookie('CSRF-TOKEN')
       try {
-        // await apiClient.get('sanctum/csrf-cookie', {
-        //   headers: {
-        //     accept: 'application/json',
-        //     'content-type': 'application/json',
-        //     withCredentials: true
-        //   }
-        // })
         await apiClient.post('/login', {
           email: this.email,
           password: this.password

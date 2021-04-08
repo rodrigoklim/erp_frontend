@@ -24,31 +24,31 @@
               to="/"
               label="Home"
               name="home"
-              style="font-family: poppins; font-weight:70px; font-size: 20px; color:#007bff; opacity: 0.75"
+              style="font-family: poppins; font-weight:800 !important; font-size: 20px; color:#007bff; opacity: 0.75"
             />
             <q-route-tab
               to="/pre-venda"
               label="Pré-Venda"
               name="presell"
-              style="font-family: poppins; font-weight:70px; font-size: 20px; color:#007bff; opacity: 0.75"
+              style="font-family: poppins; font-weight:800 !important; font-size: 20px; color:#007bff; opacity: 0.75"
             />
             <q-route-tab
               to="/rotas"
               label="Rotas "
               name="routes"
-              style="font-family: poppins; font-weight:70px; font-size: 20px; color:#007bff; opacity: 0.75"
+              style="font-family: poppins; font-weight:800 !important; font-size: 20px; color:#007bff; opacity: 0.75"
             />
             <q-route-tab
               to="/entregas"
               label="Entregas"
               name="deliveryFollowUp"
-              style="font-family: poppins; font-weight:70px; font-size: 20px; color:#007bff; opacity: 0.75"
+              style="font-family: poppins; font-weight:800 !important; font-size: 20px; color:#007bff; opacity: 0.75"
             />
             <q-route-tab
               to="/page3"
               label="Manutenção"
               name="maintenance"
-              style="font-family: poppins; font-weight:70px; font-size: 20px; color:#007bff; opacity: 0.75"
+              style="font-family: poppins; font-weight:800 !important; font-size: 20px; color:#007bff; opacity: 0.75"
             />
             <q-btn-dropdown
               auto-close
@@ -57,9 +57,9 @@
               no-caps
               label="Cadastro"
               name="register"
-              style="font-family: poppins; font-weight:70px; font-size: 14px; color:#007bff; opacity: 0.75"
+              style="font-family: poppins; font-weight:800 !important; font-size: 14px; color:#007bff; opacity: 0.75"
             >
-              <q-list style="background-color: #181825;font-family: poppins; font-weight:70px; font-size: 14px; color:#007bff; opacity: 0.75">
+              <q-list style="background-color: #181825;font-family: poppins; font-weight:800 !important; font-size: 14px; color:#007bff; opacity: 0.75">
                 <q-item
                   clickable
                   to="/clientes"
@@ -98,9 +98,9 @@
               flat
               :label="user"
               no-caps
-              style="font-family: poppins; font-weight:50px; font-size: 14px; color:#007bff; opacity: 0.75; width: 175px"
+              style="font-family: poppins; font-weight:800; font-size: 14px; color:#007bff; opacity: 0.75; width: 175px"
             >
-              <q-list style="background-color: #181825;font-family: poppins; font-weight:70px; font-size: 14px; color:#007bff; opacity: 0.75">
+              <q-list style="background-color: #181825;font-family: poppins; font-weight:800; font-size: 14px; color:#007bff; opacity: 0.75">
                 <q-item
                   clickable
                   @click='logout'
@@ -167,3 +167,10 @@ export default {
   }
 }
 </script>
+<style>
+.q-tab__label {
+  font-size: 14px;
+  line-height: 1.715em;
+  font-weight: 800;
+}
+</style>

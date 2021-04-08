@@ -436,11 +436,11 @@ export default {
       apiClient.post(url, data, config).then(response => {
         if (response.data === 'ok') {
           this.submitting = false
-          this.$router.push('/', () => {
+          this.$router.push('/produtos', () => {
             this.$q.notify({
               color: 'teal',
               icon: 'check',
-              message: 'Cliente Cadastrado com sucesso!',
+              message: 'Produto cadastrado com sucesso!',
               position: 'top-right'
             })
           })
@@ -448,11 +448,11 @@ export default {
         } else {
           this.submitting = false
           console.log('response', response.data)
-          this.$router.push('/clientes', () => {
+          this.$router.push('/produtos', () => {
             this.$q.notify({
               color: 'tomato',
               icon: 'warning',
-              message: 'Cliente não cadastrado, verifique os dados!',
+              message: 'Produto não cadastrado, verifique os dados!',
               position: 'top-right'
             })
           })
@@ -484,7 +484,7 @@ export default {
       this.$q.notify({
         color: 'red-7',
         icon: 'warning',
-        message: 'Cliente não cadastrado, falha no envio!',
+        message: 'Produto não cadastrado, falha no envio!',
         position: 'top-right'
       })
     }
@@ -524,7 +524,7 @@ export default {
     this.$q.notify({
       color: 'red-7',
       icon: 'warning',
-      message: 'Cliente não cadastrado, falha no envio!',
+      message: 'Produto não cadastrado, falha no envio!',
       position: 'top-right'
     })
   }

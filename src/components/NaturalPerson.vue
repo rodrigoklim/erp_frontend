@@ -68,43 +68,39 @@
                 />
               </div>
               <!-- fiscal state | Register Situation -->
-              <div class="row fit justify-center items-center content-start q-mt-lg">
+              <div class="row fit justify-start items-center content-start q-mt-lg">
                 <div class="col-6">
-                  <div
+                  <q-field
+                    outlined
+                    dark
                     class="row"
                     style="background-color: #1d1d1d"
                   >
-                    <div class="col-6">
-                      <div
-                        class="text q-mt-sm q-ml-md"
-                        style="font-weight: 300; font-size: 1.1rem"
-                      >Nota Fiscal:</div>
-                    </div>
-                    <div class="col-6">
-                      <q-field
-                        ref="nf"
-                        bottom-slots
-                        :value="form.nf"
-                        :rules="[val => !!val]"
-                        style="font-size: 16px"
-                      >
-                        <template v-slot:control>
-                          <q-toggle
-                            ref="nf"
-                            v-model="form.nf"
-                            color="teal"
-                            indeterminate-value="false"
-                            size="lg"
-                            checked-icon="check"
-                            unchecked-icon="clear"
-                          />
-                        </template>
-                        <template v-slot:error>
-                          Campo obrigatório.
-                        </template>
-                      </q-field>
-                    </div>
-                  </div>
+                    <template v-slot:control>
+                      <div class="col-6 self-center q-pb-sm">
+                        <div
+                          class="text q-mt-sm q-ml-md text-uppercase text-caption"
+                          style="font-weight: 300; font-size: 1.1rem"
+                        >Nota Fiscal:</div>
+                      </div>
+                      <div class="col-6">Não
+                        <q-toggle
+                          ref="nf"
+                          v-model="form.nf"
+                          color="teal"
+                          indeterminate-value="false"
+                          size="lg"
+                          checked-icon="check"
+                          label="Sim"
+                          unchecked-icon="clear"
+                          class="q-ml-2"
+                        />
+                      </div>
+                    </template>
+                    <template v-slot:error>
+                      Campo obrigatório.
+                    </template>
+                  </q-field>
                 </div>
               </div>
               <!-- phones -->
@@ -139,9 +135,9 @@
                   </div>
                 </div>
               </div>
+              <!-- /Register Data END -->
             </div>
           </div>
-          <!-- /Register Data END -->
           <div class="row justify-center fit items-center content-start q-mt-md q-mb-lg">
             <div class="col-11">
               <!-- separator -->
@@ -214,27 +210,26 @@
                 </div>
               </div>
               <!-- /products -->
-
             </div>
-            <!-- submit buttons -->
-            <div class="row fit justify-center q-mt-lg q-mb-lg">
-              <q-btn
-                label="Criar Cliente"
-                style="width: 300px"
-                push
-                type="submit"
-                color="primary"
-                :loading="submitting"
-              >
-                <template v-slot:loading>
-                  <q-spinner-orbit
-                    color="white"
-                    size="1.35em"
-                  />
-                </template>
+          </div>
+          <!-- submit buttons -->
+          <div class="row fit justify-center q-mt-lg q-mb-lg">
+            <q-btn
+              label="Criar Cliente"
+              style="width: 300px"
+              push
+              type="submit"
+              color="primary"
+              :loading="submitting"
+            >
+              <template v-slot:loading>
+                <q-spinner-orbit
+                  color="white"
+                  size="1.35em"
+                />
+              </template>
 
-              </q-btn>
-            </div>
+            </q-btn>
           </div>
         </q-form>
       </div>

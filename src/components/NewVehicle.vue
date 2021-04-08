@@ -627,264 +627,262 @@
             />
           </div>
         </div>
-        <div class="row">
-          <h5 class="q-ma-sm q-mb-none">Certificados</h5>
-        </div>
       </div>
-      <!-- / separator -->
-
-      <!-- Certificates -->
-      <div class="row justify-center fit items-center content-start q-mt-md q-mb-lg">
-        <div class="col-11">
-          <div class="row justify-center fit items-top content-strech q-mt-md q-mb-lg">
-            <div class="col q-mr-sm">
-              <q-input
-                class="text-uppercase"
-                outlined
-                dark
-                label="Certificado CIV"
-                v-model="vehicle.civ"
-                :rules="[val => !!val || 'Campo obrigatório.']"
-                style="width: 100%;"
-              >
-                <template v-slot:append>
-                  <q-icon
-                    name="event"
-                    class="cursor-pointer"
-                  >
-                    <q-popup-proxy
-                      ref="qDateProxy"
-                      transition-show="scale"
-                      transition-hide="scale"
-                    >
-                      <q-date
-                        v-model="vehicle.civ"
-                        dark
-                        :locale="myLocale"
-                        mask=DD/MM/YYYY
-                      >
-                        <div class="row items-center justify-end">
-                          <q-btn
-                            v-close-popup
-                            label="Close"
-                            color="primary"
-                            flat
-                          />
-                        </div>
-                      </q-date>
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
-            </div>
-            <div class="col q-ml-sm">
-              <q-input
-                class="text-uppercase"
-                outlined
-                dark
-                label="Certificado CIPP"
-                v-model="vehicle.cipp"
-                :rules="[val => !!val || 'Campo obrigatório.']"
-                style="width: 100%;"
-              >
-                <template v-slot:append>
-                  <q-icon
-                    name="event"
-                    class="cursor-pointer"
-                  >
-                    <q-popup-proxy
-                      ref="qDateProxy"
-                      transition-show="scale"
-                      transition-hide="scale"
-                    >
-                      <q-date
-                        v-model="vehicle.cipp"
-                        dark
-                        :locale="myLocale"
-                        mask=DD/MM/YYYY
-                      >
-                        <div class="row items-center justify-end">
-                          <q-btn
-                            v-close-popup
-                            label="Close"
-                            color="primary"
-                            flat
-                          />
-                        </div>
-                      </q-date>
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
-            </div>
-          </div>
-          <div class="row justify-center fit items-top content-strech q-mt-md q-mb-lg">
-            <div class="col q-mr-sm">
-              <q-input
-                class="text-uppercase"
-                outlined
-                dark
-                label="Certificado de Válvulas"
-                v-model="vehicle.valvule"
-                :rules="[val => !!val || 'Campo obrigatório.']"
-                style="width: 100%;"
-              >
-                <template v-slot:append>
-                  <q-icon
-                    name="event"
-                    class="cursor-pointer"
-                  >
-                    <q-popup-proxy
-                      ref="qDateProxy"
-                      transition-show="scale"
-                      transition-hide="scale"
-                    >
-                      <q-date
-                        v-model="vehicle.valvule"
-                        dark
-                        :locale="myLocale"
-                        mask=DD/MM/YYYY
-                      >
-                        <div class="row items-center justify-end">
-                          <q-btn
-                            v-close-popup
-                            label="Close"
-                            color="primary"
-                            flat
-                          />
-                        </div>
-                      </q-date>
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
-            </div>
-            <div class="col q-ml-sm">
-              <q-input
-                class="text-uppercase"
-                outlined
-                dark
-                label="Certificado IBAMA"
-                v-model="vehicle.ibama"
-                :rules="[val => !!val || 'Campo obrigatório.']"
-                style="width: 100%;"
-              >
-                <template v-slot:append>
-                  <q-icon
-                    name="event"
-                    class="cursor-pointer"
-                  >
-                    <q-popup-proxy
-                      ref="qDateProxy"
-                      transition-show="scale"
-                      transition-hide="scale"
-                    >
-                      <q-date
-                        v-model="vehicle.ibama"
-                        dark
-                        :locale="myLocale"
-                        mask=DD/MM/YYYY
-                      >
-                        <div class="row items-center justify-end">
-                          <q-btn
-                            v-close-popup
-                            label="Close"
-                            color="primary"
-                            flat
-                          />
-                        </div>
-                      </q-date>
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
-            </div>
-          </div>
-          <div class="row justify-center fit items-top content-strech q-mt-md q-mb-lg">
-            <div class="col q-mr-sm">
-              <q-input
-                class="text-uppercase"
-                outlined
-                dark
-                label="Certificado CTF"
-                v-model="vehicle.ctf"
-                :rules="[val => !!val || 'Campo obrigatório.']"
-                style="width: 100%;"
-              >
-                <template v-slot:append>
-                  <q-icon
-                    name="event"
-                    class="cursor-pointer"
-                  >
-                    <q-popup-proxy
-                      ref="qDateProxy"
-                      transition-show="scale"
-                      transition-hide="scale"
-                    >
-                      <q-date
-                        v-model="vehicle.ctf"
-                        dark
-                        :locale="myLocale"
-                        mask=DD/MM/YYYY
-                      >
-                        <div class="row items-center justify-end">
-                          <q-btn
-                            v-close-popup
-                            label="Close"
-                            color="primary"
-                            flat
-                          />
-                        </div>
-                      </q-date>
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
-            </div>
-            <div class="col q-ml-sm">
-              <q-input
-                class="text-uppercase"
-                outlined
-                dark
-                label="Certificado Tacógrafo"
-                v-model="vehicle.tachograph"
-                :rules="[val => !!val || 'Campo obrigatório.']"
-                style="width: 100%;"
-              >
-                <template v-slot:append>
-                  <q-icon
-                    name="event"
-                    class="cursor-pointer"
-                  >
-                    <q-popup-proxy
-                      ref="qDateProxy"
-                      transition-show="scale"
-                      transition-hide="scale"
-                    >
-                      <q-date
-                        v-model="vehicle.tachograph"
-                        dark
-                        :locale="myLocale"
-                        mask=DD/MM/YYYY
-                      >
-                        <div class="row items-center justify-end">
-                          <q-btn
-                            v-close-popup
-                            label="Close"
-                            color="primary"
-                            flat
-                          />
-                        </div>
-                      </q-date>
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
-            </div>
+      <div v-if="vehicle.type === 'caminhoes'">
+        <div class="col-12">
+          <div class="row">
+            <h5 class="q-ma-sm q-mb-none">Certificados</h5>
           </div>
         </div>
-      </div>
+        <!-- / separator -->
 
+        <!-- Certificates -->
+
+        <div class="row justify-center fit items-center content-start q-mt-md q-mb-lg">
+          <div class="col-11">
+            <div class="row justify-center fit items-top content-strech q-mt-md q-mb-lg">
+              <div class="col q-mr-sm">
+                <q-input
+                  class="text-uppercase"
+                  outlined
+                  dark
+                  label="Certificado CIV"
+                  v-model="vehicle.civ"
+                  style="width: 100%;"
+                >
+                  <template v-slot:append>
+                    <q-icon
+                      name="event"
+                      class="cursor-pointer"
+                    >
+                      <q-popup-proxy
+                        ref="qDateProxy"
+                        transition-show="scale"
+                        transition-hide="scale"
+                      >
+                        <q-date
+                          v-model="vehicle.civ"
+                          dark
+                          :locale="myLocale"
+                          mask=DD/MM/YYYY
+                        >
+                          <div class="row items-center justify-end">
+                            <q-btn
+                              v-close-popup
+                              label="Close"
+                              color="primary"
+                              flat
+                            />
+                          </div>
+                        </q-date>
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                </q-input>
+              </div>
+              <div class="col q-ml-sm">
+                <q-input
+                  class="text-uppercase"
+                  outlined
+                  dark
+                  label="Certificado CIPP"
+                  v-model="vehicle.cipp"
+                  style="width: 100%;"
+                >
+                  <template v-slot:append>
+                    <q-icon
+                      name="event"
+                      class="cursor-pointer"
+                    >
+                      <q-popup-proxy
+                        ref="qDateProxy"
+                        transition-show="scale"
+                        transition-hide="scale"
+                      >
+                        <q-date
+                          v-model="vehicle.cipp"
+                          dark
+                          :locale="myLocale"
+                          mask=DD/MM/YYYY
+                        >
+                          <div class="row items-center justify-end">
+                            <q-btn
+                              v-close-popup
+                              label="Close"
+                              color="primary"
+                              flat
+                            />
+                          </div>
+                        </q-date>
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                </q-input>
+              </div>
+            </div>
+            <div class="row justify-center fit items-top content-strech q-mt-md q-mb-lg">
+              <div class="col q-mr-sm">
+                <q-input
+                  class="text-uppercase"
+                  outlined
+                  dark
+                  label="Certificado de Válvulas"
+                  v-model="vehicle.valvule"
+                  style="width: 100%;"
+                >
+                  <template v-slot:append>
+                    <q-icon
+                      name="event"
+                      class="cursor-pointer"
+                    >
+                      <q-popup-proxy
+                        ref="qDateProxy"
+                        transition-show="scale"
+                        transition-hide="scale"
+                      >
+                        <q-date
+                          v-model="vehicle.valvule"
+                          dark
+                          :locale="myLocale"
+                          mask=DD/MM/YYYY
+                        >
+                          <div class="row items-center justify-end">
+                            <q-btn
+                              v-close-popup
+                              label="Close"
+                              color="primary"
+                              flat
+                            />
+                          </div>
+                        </q-date>
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                </q-input>
+              </div>
+              <div class="col q-ml-sm">
+                <q-input
+                  class="text-uppercase"
+                  outlined
+                  dark
+                  label="Certificado IBAMA"
+                  v-model="vehicle.ibama"
+                  style="width: 100%;"
+                >
+                  <template v-slot:append>
+                    <q-icon
+                      name="event"
+                      class="cursor-pointer"
+                    >
+                      <q-popup-proxy
+                        ref="qDateProxy"
+                        transition-show="scale"
+                        transition-hide="scale"
+                      >
+                        <q-date
+                          v-model="vehicle.ibama"
+                          dark
+                          :locale="myLocale"
+                          mask=DD/MM/YYYY
+                        >
+                          <div class="row items-center justify-end">
+                            <q-btn
+                              v-close-popup
+                              label="Close"
+                              color="primary"
+                              flat
+                            />
+                          </div>
+                        </q-date>
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                </q-input>
+              </div>
+            </div>
+            <div class="row justify-center fit items-top content-strech q-mt-md q-mb-lg">
+              <div class="col q-mr-sm">
+                <q-input
+                  class="text-uppercase"
+                  outlined
+                  dark
+                  label="Certificado CTF"
+                  v-model="vehicle.ctf"
+                  style="width: 100%;"
+                >
+                  <template v-slot:append>
+                    <q-icon
+                      name="event"
+                      class="cursor-pointer"
+                    >
+                      <q-popup-proxy
+                        ref="qDateProxy"
+                        transition-show="scale"
+                        transition-hide="scale"
+                      >
+                        <q-date
+                          v-model="vehicle.ctf"
+                          dark
+                          :locale="myLocale"
+                          mask=DD/MM/YYYY
+                        >
+                          <div class="row items-center justify-end">
+                            <q-btn
+                              v-close-popup
+                              label="Close"
+                              color="primary"
+                              flat
+                            />
+                          </div>
+                        </q-date>
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                </q-input>
+              </div>
+              <div class="col q-ml-sm">
+                <q-input
+                  class="text-uppercase"
+                  outlined
+                  dark
+                  label="Certificado Tacógrafo"
+                  v-model="vehicle.tachograph"
+                  style="width: 100%;"
+                >
+                  <template v-slot:append>
+                    <q-icon
+                      name="event"
+                      class="cursor-pointer"
+                    >
+                      <q-popup-proxy
+                        ref="qDateProxy"
+                        transition-show="scale"
+                        transition-hide="scale"
+                      >
+                        <q-date
+                          v-model="vehicle.tachograph"
+                          dark
+                          :locale="myLocale"
+                          mask=DD/MM/YYYY
+                        >
+                          <div class="row items-center justify-end">
+                            <q-btn
+                              v-close-popup
+                              label="Close"
+                              color="primary"
+                              flat
+                            />
+                          </div>
+                        </q-date>
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                </q-input>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- button -->
       <div class="row justify-center fit items-center content-start q-mt-md q-mb-lg">
         <q-btn

@@ -1,1 +1,28 @@
 /* app global css */
+/* body{
+    font-family: 'Poppins';
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap'); */
+
+@font-face {
+  font-family: raleway;
+  src: local("raleway") format("truetype"),
+    url("../assets/fonts/raleway-bold-webfont.ttf");
+}
+
+@font-face {
+  font-family: poppins;
+  src: local("poppins") format("truetype"),
+    url("https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap");
+}
+
+.poppins {
+  font-family: 'poppins';
+}
+
+.raleway {
+    font-family: 'raleway';
+}
+
+/* vsvi+e2= fv frequencia */

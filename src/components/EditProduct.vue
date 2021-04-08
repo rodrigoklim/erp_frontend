@@ -17,7 +17,9 @@
           :data="products"
           :columns="columns"
           :filter="filter"
-          row-key="name"
+          :pagination.sync="pagination"
+          :sort-method="customSort"
+          row-key="id"
           dark
           color="amber"
           style="color:white; opacity:0.95; font-family: poppins; font-weight: 300;"
@@ -39,6 +41,16 @@
           </template>
           <template v-slot:body="props">
             <q-tr :props="props">
+              <q-td auto-width>
+                <q-btn
+                  size="sm"
+                  color="primary"
+                  round
+                  dense
+                  @click="props.expand = !props.expand"
+                  :icon="props.expand ? 'remove' : 'add'"
+                />
+              </q-td>
               <q-td
                 key="id"
                 :props="props"
@@ -48,14 +60,32 @@
               <q-td
                 key="product"
                 :props="props"
+                style="cursor:pointer"
               >
                 {{props.row.product}}
+                <q-popup-edit
+                  v-model="props.row.product"
+                  title="Editar Nome do Produto"
+                  buttons
+                  persistent
+                  @save="editProduct(props.row)"
+                  content-style="color:white; background-color:#1d1d1d"
+                >
+                  <q-input
+                    type="text"
+                    v-model="props.row.product"
+                    dense
+                    autofocus
+                    dark
+                    class="text-uppercase"
+                  />
+                </q-popup-edit>
               </q-td>
               <q-td
                 key="max_price"
                 :props="props"
                 style="cursor:pointer"
-              > R$
+              >
                 {{ ((parseFloat(props.row.max_price))/100).toFixed(2) }}
                 <q-popup-edit
                   v-model="props.row.max_price"
@@ -63,7 +93,7 @@
                   buttons
                   persistent
                   @save="editProduct(props.row)"
-                  content-style="color:white; opacity: 0.75; background-color:#1d1d1d"
+                  content-style="color:white; background-color:#1d1d1d"
                 >
                   <q-input
                     type="text"
@@ -118,9 +148,9 @@
                   buttons
                   persistent
                   @save="editProduct(props.row)"
-                  content-style="color:white; opacity: 0.75; background-color:#1d1d1d"
+                  content-style="color:white; background-color:#1d1d1d"
                 >
-                  <div class="row justify-center">
+                  <div class="row justify-center items-center">Inativo
                     <q-toggle
                       label="Ativo"
                       color="teal"
@@ -131,9 +161,143 @@
                     />
                   </div>
                 </q-popup-edit>
+
+              </q-td>
+            </q-tr>
+            <q-tr
+              v-show="props.expand"
+              :props="props"
+            >
+              <q-td colspan="100%">
+                <div class="text-uppercase q-pb-md text-h6">Dados Complementares</div>
+                <div class="row q-ma-md">
+                  <div class="col">
+                    <div class="row text-caption text-uppercase q-pb-sm">
+                      <div class="col">Categoria</div>
+                      <div class="col text-amber">{{props.row.category}}</div>
+                    </div>
+                    <div class="row text-caption text-uppercase q-pb-sm">
+                      <div class="col">Classificação</div>
+                      <div class="col text-amber">{{props.row.classification}}</div>
+                    </div>
+                    <div class="row text-caption text-uppercase q-pb-sm">
+                      <div class="col">Unidade</div>
+                      <div class="col text-amber">{{props.row.unity}}</div>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="row text-caption text-uppercase q-pb-sm">
+                      <div class="col">NCM</div>
+                      <div class="col text-amber">{{props.row.ncm}}</div>
+                    </div>
+                    <div class="row text-caption text-uppercase q-pb-sm">
+                      <div class="col">CEST</div>
+                      <div class="col text-amber">{{props.row.cest}}</div>
+                    </div>
+                    <div class="row text-caption text-uppercase q-pb-sm">
+                      <div class="col">CSOSN</div>
+                      <div class="col text-amber">{{props.row.csosn}}</div>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="row text-caption text-uppercase q-pb-sm">
+                      <div class="col">Peso</div>
+                      <div class="col text-amber">{{props.row.weigth}}</div>
+                    </div>
+                    <div class="row text-caption text-uppercase q-pb-sm">
+                      <div class="col">Operação</div>
+                      <div class="col text-amber">{{props.row.operation}}</div>
+                    </div>
+                  </div>
+                </div>
               </q-td>
             </q-tr>
           </template>
+          <!-- <template v-slot:item="props">
+            <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4">
+              <q-card
+                dark
+                style="background-color:#2d2d2d"
+              >
+                <q-card-section>
+                  <q-expansion-item
+                    expand-separator
+                    :label="props.row.product "
+                  >
+                    <q-separator
+                      color="white"
+                      style="opacity:0.85"
+                    />
+                    <q-input
+                      type="text"
+                      v-model="props.row.product"
+                      label="Produto"
+                      dense
+                      autofocus
+                      dark
+                      borderless
+                      class="text-uppercase q-pt-md"
+                    />
+                    <q-card-section class="q-pa-none q-pt-md">
+                      <div class="row q-pb-md">
+                        <div class="col-4">
+                          <q-input
+                            type="text"
+                            mask="R$ #.##"
+                            unmasked-value
+                            fill-mask="0"
+                            reverse-fill-mask
+                            v-model="props.row.max_price"
+                            label="Preço"
+                            borderless
+                            autofocus
+                            dark
+                            style="height: 100%"
+                          />
+                        </div>
+                        <div class="col-8">
+                          <q-field
+                            borderless
+                            label="Status"
+                            dark
+                            dense
+                            class="q-pl-sm q-mb-sm"
+                            style="font-weigth: 500; font-size:12px"
+                          >
+                            <div class="row justify-center items-center text-white q-pt-md">Inativo
+                              <q-toggle
+                                label="Ativo"
+                                color="teal"
+                                dense
+                                false-value="0"
+                                true-value="1"
+                                v-model="props.row.status"
+                                style="color:white"
+                                class="q-ml-sm"
+                              />
+                            </div>
+                          </q-field>
+                        </div>
+                      </div>
+                      <div class="row q-pb-md">
+                        <q-btn
+                          push
+                          color="primary"
+                          label="Salvar Alterações"
+                          @click="editProduct(props.row)"
+                        />
+                      </div>
+                    </q-card-section>
+                    <q-separator
+                      color="white"
+                      style="opacity:0.85"
+                    />
+
+                  </q-expansion-item>
+                </q-card-section>
+              </q-card>
+            </div>
+          </template> -->
         </q-table>
       </div>
     </div>
@@ -147,6 +311,7 @@ export default {
   data () {
     return {
       columns: [
+        { name: '', align: 'start', label: '' },
         { name: 'id', align: 'center', label: '#', field: 'id', sortable: true },
         { name: 'product', label: 'Produto', align: 'start', field: 'product', sortable: true },
         { name: 'max_price', align: 'left', label: 'Preço', field: 'max_price', sortable: true },
@@ -156,7 +321,11 @@ export default {
         { name: 'status', align: 'center', label: 'Status', field: 'status', sortable: true }
       ],
       filter: '',
-      products: []
+      products: [],
+      pagination: {
+        rowsPerPage: 0
+      },
+      selected: []
     }
   },
   created () {
@@ -174,7 +343,30 @@ export default {
     })
   },
   methods: {
+    customSort (rows, sortBy, descending) {
+      const data = [...rows]
+
+      if (sortBy) {
+        data.sort((a, b) => {
+          const x = descending ? b : a
+          const y = descending ? a : b
+          if (sortBy !== 'max_price') {
+            // string sort
+            return x[sortBy] > y[sortBy] ? 1 : x[sortBy] < y[sortBy] ? -1 : 0
+          } else {
+            // numeric sort
+            return parseFloat(x[sortBy]) - parseFloat(y[sortBy])
+          }
+        })
+      }
+
+      return data
+    },
+    details () {
+      console.log(this.row)
+    },
     editProduct (product) {
+      console.log(product)
       const url = '/product/edit'
       const data = {
         params: {
@@ -187,6 +379,7 @@ export default {
         }
       }
       apiClient.post(url, data, config).then(response => {
+        console.log(response.data)
         if (response.data === 'ok') {
           this.$q.notify({
             color: 'teal',
