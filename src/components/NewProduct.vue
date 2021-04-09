@@ -445,6 +445,7 @@ export default {
             })
           })
           console.log('response', response.data)
+          alert('1')
         } else {
           this.submitting = false
           console.log('response', response.data)

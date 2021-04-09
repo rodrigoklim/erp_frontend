@@ -67,6 +67,17 @@
                         color="white"
                         style="opacity:0.85"
                       />
+                      <q-card-section class="text-left q-pb-none">
+                        <q-input
+                          style="width: 100%;"
+                          v-model="props.row.nickname"
+                          outlined
+                          dark
+                          label="Apelido"
+                          class="text-uppercase"
+                          :rules="[val => !!val || 'Campo obrigatório.']"
+                        />
+                      </q-card-section>
                       <q-card-section class="flex flex-center q-pb-none">
                         <div class="row justify-center fit items-top content-strech">
                           <div class="col q-mr-sm">
@@ -621,6 +632,7 @@ export default {
         }
       }
       apiClient.post(url, data, config).then(response => {
+        console.log(response.data)
         if (response.data === 'ok') {
           this.$q.notify({
             color: 'teal',
@@ -701,5 +713,8 @@ element.style {
   left: 214.75px;
   background-color: #1d1d1d !important;
   color: white !important;
+}
+.q-menu {
+  min-height: 100px !important;
 }
 </style>
