@@ -436,20 +436,17 @@ export default {
       apiClient.post(url, data, config).then(response => {
         if (response.data === 'ok') {
           this.submitting = false
-          this.$router.push('/produtos', () => {
-            this.$q.notify({
-              color: 'teal',
-              icon: 'check',
-              message: 'Produto cadastrado com sucesso!',
-              position: 'top-right'
-            })
+          this.$q.notify({
+            color: 'teal',
+            icon: 'check',
+            message: 'Produto cadastrado com sucesso!',
+            position: 'top-right'
           })
-          console.log('response', response.data)
-          alert('1')
+          this.$emit('productCreated', 'edit')
         } else {
           this.submitting = false
           console.log('response', response.data)
-          this.$router.push('/produtos', () => {
+          this.$emit('newProduct', 'edit', function () {
             this.$q.notify({
               color: 'tomato',
               icon: 'warning',

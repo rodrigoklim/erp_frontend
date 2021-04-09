@@ -38,15 +38,15 @@
             <q-tab-panels
               v-model="tab"
               animated
-              transition-prev="flip-up"
-              transition-next="flip-down"
+              transition-prev="slide-left"
+              transition-next="slide-right"
             >
               <q-tab-panel
                 dark
                 name='np'
                 style="background-color:#1d1d1d"
               >
-                <new-product></new-product>
+                <new-product @productCreated="productCreated"></new-product>
               </q-tab-panel>
               <q-tab-panel
                 dark
@@ -66,6 +66,7 @@
 <script>
 import NewProduct from 'src/components/NewProduct.vue'
 import EditProduct from 'src/components/EditProduct.vue'
+
 export default {
   components: { NewProduct, EditProduct },
   name: 'Products',
@@ -73,9 +74,18 @@ export default {
     return {
       tab: 'edit'
     }
+  },
+  methods: {
+    productCreated (value) {
+      this.tab = value
+      console.log(value)
+    }
   }
 }
 </script>
 
 <style>
+.block{
+  font-weight: bold;
+}
 </style>
