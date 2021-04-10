@@ -22,9 +22,10 @@
                     toggle-color="primary"
                     flat
                     :options="[
+                      {label: 'Listar Clientes', value: 'edit', icon: 'mode_edit'},
                       {label: 'Pessoa Física', value: 'np', icon: 'account_box'},
-                      {label: 'Pessoa Jurídica', value: 'le', icon:'account_balance'},
-                      {label: 'Listar Clientes', value: 'edit', icon: 'mode_edit'}
+                      {label: 'Pessoa Jurídica', value: 'le', icon:'account_balance'}
+
                     ]"
                   />
                 </div>

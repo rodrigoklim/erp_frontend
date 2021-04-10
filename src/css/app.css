@@ -1,20 +1,14 @@
 /* app global css */
-/* body{
-    font-family: 'Poppins';
-}
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap'); */
 
 @font-face {
   font-family: raleway;
-  src: local("raleway") format("truetype"),
-    url("../assets/fonts/raleway-bold-webfont.ttf");
+  src: local("raleway"),url("../assets/fonts/raleway-bold-webfont.ttf") format("truetype");
 }
 
 @font-face {
   font-family: poppins;
-  src: local("poppins") format("truetype"),
-    url("https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap");
+  src: local("poppins"),url("../assets/fonts/Poppins-ExtraLight.ttf") format("truetype");
 }
 
 .poppins {
@@ -25,4 +19,53 @@
     font-family: 'raleway';
 }
 
+.vue-input-tag-wrapper .input-tag .remove:empty:before {
+  content: " x";
+  color: tomato;
+}
+
+.text-negative {
+  color: tomato !important;
+}
+
+.q-field--error .q-field__bottom {
+  color: tomato !important;
+  font-weight: 600 !important;  ;
+}
+
+.input-tag {
+  background-color: #616161 !important;
+  border-radius: 2px !important;
+  border: 1px solid #313131 !important;
+  color: #fff !important;
+  display: inline-block;
+  font-size: 17px !important;
+  margin-bottom: 4px;
+  margin-right: 4px;
+  padding: 3px;
+}
+.q-field__label{
+  font-weight: 600;
+}
+.block {
+  font-weight: bold;
+}
+.text-h4, .text-h5, h5{
+  font-family: 'Raleway', sans-serif;
+  opacity: 0.75;
+}
+.q-stepper__title {
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 18px;
+  letter-spacing: 0.1px;
+}
+.q-tab__label {
+  font-size: 16px!important;
+  line-height: 1.715em!important;
+  font-weight: bold!important;
+}
+.text-caption{
+  font-weight: bold;
+}
 /* vsvi+e2= fv frequencia */

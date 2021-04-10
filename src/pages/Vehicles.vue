@@ -23,9 +23,9 @@
                       toggle-color="primary"
                       flat
                       :options="[
-                      {label: 'Novo Veículo', value: 'nv', icon: 'fas fa-truck-moving'},
-                      {label: 'Listar Veículos', value: 'edit', icon: 'mode_edit'}
-                    ]"
+                        {label: 'Listar Veículos', value: 'edit', icon: 'mode_edit'},
+                      {label: 'Novo Veículo', value: 'nv', icon: 'fas fa-truck-moving'}
+                      ]"
                     />
                   </div>
                 </div>

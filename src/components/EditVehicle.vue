@@ -575,24 +575,6 @@ export default {
       if (response.data[0].toothed_belt_change !== null) {
         self.visibleColumns.push('toothed_belt_change')
       }
-    }).catch(error => {
-      if (error.response) {
-        /*
-         * The request was made and the server responded with a
-         * status code that falls out of the range of 2xx
-         */
-        this.handleError()
-        console.log(error.response.data)
-        console.log(error.response.status)
-        console.log(error.response.headers)
-      } else if (error.request) {
-        this.handleError()
-        console.log(error.request)
-      } else {
-        // Something happened in setting up the request and triggered an Error
-        this.handleError()
-        console.log('Error', error.message)
-      }
     })
   },
   methods: {

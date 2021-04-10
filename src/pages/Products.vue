@@ -23,8 +23,8 @@
                       toggle-color="primary"
                       flat
                       :options="[
-                      {label: 'Novo Produto', value: 'np', icon: 'fas fa-dolly'},
-                      {label: 'Listar Produtos', value: 'edit', icon: 'mode_edit'}
+                      {label: 'Listar Produtos', value: 'edit', icon: 'mode_edit'},
+                       {label: 'Novo Produto', value: 'np', icon: 'fas fa-dolly'}
                     ]"
                     />
                   </div>
@@ -43,17 +43,17 @@
             >
               <q-tab-panel
                 dark
-                name='np'
-                style="background-color:#1d1d1d"
-              >
-                <new-product @productCreated="productCreated"></new-product>
-              </q-tab-panel>
-              <q-tab-panel
-                dark
                 name='edit'
                 style="background-color:#1d1d1d"
               >
                 <edit-product></edit-product>
+              </q-tab-panel>
+              <q-tab-panel
+                dark
+                name='np'
+                style="background-color:#1d1d1d"
+              >
+                <new-product @productCreated="productCreated"></new-product>
               </q-tab-panel>
             </q-tab-panels>
           </q-card>
