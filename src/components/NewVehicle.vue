@@ -79,7 +79,7 @@
                 option-value="id"
                 option-label="name"
                 map-options
-                @filter="filterFn"
+                @filter="filterBrands"
                 @input="getModels"
                 class="text-uppercase"
                 style="width: 95%"
@@ -107,7 +107,7 @@
                 option-label="name"
                 @input="getSpecificModels"
                 map-options
-                @filter="filterFn"
+                @filter="filterModels"
                 class="text-uppercase"
                 style="width: 95%"
                 :rules="[val => !!val || 'Campo obrigatório.']"
@@ -134,7 +134,7 @@
                 option-label="name"
                 map-options
                 @input="getVehicle"
-                @filter="filterFn"
+                @filter="filterSpecificModels"
                 class="text-uppercase"
                 style="width: 100%"
                 :rules="[val => !!val || 'Campo obrigatório.']"
@@ -938,6 +938,9 @@ export default {
       },
       submitting: false,
       brands: [],
+      brandsOptions: '',
+      modelsOptions: '',
+      specificModelsOptions: '',
       models: [],
       specificModels: [],
       myLocale: {
@@ -951,24 +954,51 @@ export default {
     }
   },
   methods: {
-    filterFn (val, update) {
+    filterBrands (val, update) {
+      console.log(val)
       if (val === '') {
         update(() => {
-          this.ncmList = this.stringOptions
+          this.brands = this.brandsOptions
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.ncmList = this.stringOptions.filter(v => v.toLowerCase().indexOf(needle) > -1)
+        this.brands = this.brandsOptions.filter(v => v.name.toLowerCase().indexOf(needle) > -1)
+      })
+    },
+    filterModels (val, update) {
+      if (val === '') {
+        update(() => {
+          this.models = this.modelsOptions
+        })
+        return
+      }
+
+      update(() => {
+        const needle = val.toLowerCase()
+        this.models = this.modelsOptions.filter(v => v.name.toLowerCase().indexOf(needle) > -1)
+      })
+    },
+    filterSpecificModels (val, update) {
+      if (val === '') {
+        update(() => {
+          this.specificModels = this.specificModelsOptions
+        })
+        return
+      }
+
+      update(() => {
+        const needle = val.toLowerCase()
+        this.specificModels = this.specificModelsOptions.filter(v => v.name.toLowerCase().indexOf(needle) > -1)
       })
     },
     getBrands () {
       const self = this
       const url = 'https://fipeapi.appspot.com/api/1/' + this.vehicle.type + '/marcas.json'
       this.$axios.get(url).then(response => {
-        self.brands = response.data
+        self.brandsOptions = response.data
       }).catch(error => {
         console.log('error', error)
       })
@@ -978,7 +1008,7 @@ export default {
       const url = 'https://fipeapi.appspot.com/api/1/' + this.vehicle.type + '/veiculos/' + this.vehicle.brand.id + '.json'
       this.$axios.get(url).then(response => {
         console.log(response.data)
-        self.models = response.data
+        self.modelsOptions = response.data
       }).catch(error => {
         console.log('error', error)
       })
@@ -988,7 +1018,7 @@ export default {
       const url = 'https://fipeapi.appspot.com/api/1/' + this.vehicle.type + '/veiculo/' + this.vehicle.brand.id + '/' + this.vehicle.model.id + '.json'
       this.$axios.get(url).then(response => {
         console.log(response.data)
-        self.specificModels = response.data
+        self.specificModelsOptions = response.data
       }).catch(error => {
         console.log('error', error)
       })

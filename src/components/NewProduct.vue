@@ -509,7 +509,6 @@ export default {
         console.log(error.response.status)
         console.log(error.response.headers)
       } else if (error.request) {
-        this.handleError()
         this.submitting = false
         console.log(error.request)
       } else {
