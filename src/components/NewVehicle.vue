@@ -996,6 +996,9 @@ export default {
     },
     getBrands () {
       const self = this
+      this.vehicle.brand = ''
+      this.vehicle.model = ''
+      this.vehicle.specificModel = ''
       const url = 'https://fipeapi.appspot.com/api/1/' + this.vehicle.type + '/marcas.json'
       this.$axios.get(url).then(response => {
         self.brandsOptions = response.data
@@ -1005,6 +1008,8 @@ export default {
     },
     getModels () {
       const self = this
+      this.vehicle.model = ''
+      this.vehicle.specificModel = ''
       const url = 'https://fipeapi.appspot.com/api/1/' + this.vehicle.type + '/veiculos/' + this.vehicle.brand.id + '.json'
       this.$axios.get(url).then(response => {
         console.log(response.data)
@@ -1015,6 +1020,7 @@ export default {
     },
     getSpecificModels () {
       const self = this
+      this.vehicle.specificModel = ''
       const url = 'https://fipeapi.appspot.com/api/1/' + this.vehicle.type + '/veiculo/' + this.vehicle.brand.id + '/' + this.vehicle.model.id + '.json'
       this.$axios.get(url).then(response => {
         console.log(response.data)

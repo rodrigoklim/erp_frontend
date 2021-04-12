@@ -38,8 +38,8 @@
             <q-tab-panels
               v-model="tab"
               animated
-              transition-prev="flip-up"
-              transition-next="flip-down"
+              transition-prev="slide-left"
+              transition-next="slide-right"
             >
               <q-tab-panel
                 dark
