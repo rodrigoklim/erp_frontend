@@ -13,7 +13,7 @@
     "@johmun/vue-tags-input": "^2.1.0",
     "@mdi/font": "^5.9.55",
     "@quasar/extras": "^1.0.0",
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "leaflet": "^1.7.1",
     "mapbox-gl": "^2.1.1",
@@ -38,7 +38,9 @@
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
-    "eslint-plugin-vue": "^6.1.2"
+    "eslint-plugin-vue": "^6.1.2",
+    "laravel-echo": "^1.10.0",
+    "pusher-js": "^7.0.3"
   },
   "browserslist": [
     "last 10 Chrome versions",

@@ -3,7 +3,7 @@
     <q-card-section>
       <div class="row items-baseline">
         <div class="text-h5">
-          Rota #{{route.id}}
+          Rota #{{ route.id }}
         </div>
       </div>
     </q-card-section>
@@ -25,7 +25,7 @@
               </h6>
             </div>
             <div class="col text-h6">
-              {{route.delivery_date}}
+              {{ route.delivery_date }}
             </div>
           </div>
           <div
@@ -38,7 +38,7 @@
               </h6>
             </div>
             <div class="col text-h6">
-              {{vehicle}}
+              {{ vehicle }}
             </div>
           </div>
         </div>
@@ -68,7 +68,7 @@
     />
     <q-card-section>
       <div class="row items-baseline justify-start">
-        <h6 class="q-ma-md">
+        <h6 class="q-ma-md raleway">
           <q-icon
             name="fas fa-hard-hat"
             color="primary"
@@ -96,7 +96,7 @@
                       </div>
                     </div>
                     <div class="col-2">
-                      <q-checkbox v-model="form.bot_crio.use" />
+                      <q-checkbox v-model="form.bot_crio.use"/>
                     </div>
                   </div>
                   <div
@@ -131,7 +131,7 @@
                       </div>
                     </div>
                     <div class="col-2">
-                      <q-checkbox v-model="form.cylinder.use" />
+                      <q-checkbox v-model="form.cylinder.use"/>
                     </div>
                   </div>
                   <div
@@ -166,7 +166,7 @@
                       </div>
                     </div>
                     <div class="col-2">
-                      <q-checkbox v-model="form.caps.use" />
+                      <q-checkbox v-model="form.caps.use"/>
                     </div>
                   </div>
                   <div
@@ -201,7 +201,7 @@
                       </div>
                     </div>
                     <div class="col-2">
-                      <q-checkbox v-model="form.helmet.use" />
+                      <q-checkbox v-model="form.helmet.use"/>
                     </div>
                   </div>
                   <div
@@ -242,7 +242,7 @@
                       </div>
                     </div>
                     <div class="col-2">
-                      <q-checkbox v-model="form.funnel.use" />
+                      <q-checkbox v-model="form.funnel.use"/>
                     </div>
                   </div>
                   <div
@@ -277,7 +277,7 @@
                       </div>
                     </div>
                     <div class="col-2">
-                      <q-checkbox v-model="form.scale.use" />
+                      <q-checkbox v-model="form.scale.use"/>
                     </div>
                   </div>
                   <div
@@ -312,7 +312,7 @@
                       </div>
                     </div>
                     <div class="col-2">
-                      <q-checkbox v-model="form.dolly.use" />
+                      <q-checkbox v-model="form.dolly.use"/>
                     </div>
                   </div>
                   <div
@@ -341,6 +341,59 @@
       color="white"
       style="opacity: 0.75"
     />
+    <q-card-section>
+      <div class="row items-baseline justify-start">
+        <h6 class="q-ma-md raleway">
+          <q-icon
+            name="fas fa-dollar-sign"
+            color="primary"
+            size="lg"
+            class="q-mr-md"
+          />
+          Valores:
+        </h6>
+      </div>
+    </q-card-section>
+    <q-card-section>
+      <div class="row">
+        <div class="col-12">
+          <div class="row">
+            <div class="col-3">
+              <q-card
+                dark
+                class="q-ma-md"
+              >
+                <q-card-section>
+                  <div class="row">
+                    <div class="col-10">
+                      <div class="text-h6">
+                        Valor (R$)
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="row"
+                  >
+                    <q-input
+                      dark
+                      outlined
+                      dense
+                      mask="R$ ##,##"
+                      reverse-fill-mask
+                      fill-mask="0"
+                      label="Quantidade"
+                      v-model="form.money.ammount"
+                      class="q-mt-md"
+                      unmasked-value
+                    />
+                  </div>
+                </q-card-section>
+              </q-card>
+            </div>
+          </div>
+        </div>
+      </div>
+    </q-card-section>
     <q-card-actions
       align="between"
       class="q-mt-md"
@@ -374,8 +427,18 @@ export default {
       route: {},
       vehicle: '',
       columns: [
-        { name: 'product', align: 'left', label: 'Produto', field: 'product' },
-        { name: 'qty', align: 'center', label: 'Qtd', field: 'qty' }
+        {
+          name: 'product',
+          align: 'left',
+          label: 'Produto',
+          field: 'product'
+        },
+        {
+          name: 'qty',
+          align: 'center',
+          label: 'Qtd',
+          field: 'qty'
+        }
       ],
       loadTable: [],
       pagination: {
@@ -410,6 +473,9 @@ export default {
         dolly: {
           use: false,
           qty: 0
+        },
+        money: {
+          ammount: 0
         }
       }
     }

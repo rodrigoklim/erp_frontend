@@ -59,7 +59,8 @@
               name="register"
               style="font-family: poppins; font-weight:800 !important; font-size: 14px; color:#007bff; opacity: 0.75"
             >
-              <q-list style="background-color: #181825;font-family: poppins; font-weight:800 !important; font-size: 14px; color:#007bff; opacity: 0.75">
+              <q-list
+                style="background-color: #181825;font-family: poppins; font-weight:800 !important; font-size: 14px; color:#007bff; opacity: 0.75">
                 <q-item
                   clickable
                   to="/clientes"
@@ -92,6 +93,13 @@
             style="margin-top: 0.45em"
             no-caps
           >
+<!--            <q-icon-->
+<!--              name="notifications"-->
+<!--              color="red-6"-->
+<!--              style="cursor:pointer"-->
+<!--              @click="showNotif"-->
+<!--            />-->
+
             <q-btn-dropdown
               auto-close
               stretch
@@ -100,7 +108,8 @@
               no-caps
               style="font-family: poppins; font-weight:800; font-size: 14px; color:#007bff; opacity: 0.75; width: 175px"
             >
-              <q-list style="background-color: #181825;font-family: poppins; font-weight:800; font-size: 14px; color:#007bff; opacity: 0.75">
+              <q-list
+                style="background-color: #181825;font-family: poppins; font-weight:800; font-size: 14px; color:#007bff; opacity: 0.75">
                 <q-item
                   clickable
                   @click='logout'
@@ -123,7 +132,7 @@
     </q-header>
 
     <q-page-container style="background-color:#141414">
-      <router-view />
+      <router-view/>
     </q-page-container>
 
     <!-- <q-footer
@@ -144,6 +153,7 @@
 </template>
 
 <script>
+// import Echo from '../boot/laravel-echo'
 
 export default {
   name: 'MainLayout',
@@ -158,11 +168,36 @@ export default {
   },
   created () {
     this.$q.addressbarColor.set('#181825')
+    window.Echo.channel('notification-channel')
+      .listen('ChecklistNotification', (e) => {
+        console.log(e)
+      })
   },
   methods: {
     logout () {
       this.$q.sessionStorage.set('logged', 'false')
       this.$router.push('/login')
+    },
+    showNotif () {
+      this.$q.notify({
+        message: 'Jim just pinged you.',
+        color: 'red-4',
+        position: 'top-right',
+        actions: [
+          {
+            label: 'Reply',
+            color: 'yellow',
+            handler: () => { /* ... */
+            }
+          },
+          {
+            label: 'Dismiss',
+            color: 'white',
+            handler: () => { /* ... */
+            }
+          }
+        ]
+      })
     }
   }
 }

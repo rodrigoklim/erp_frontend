@@ -24,7 +24,8 @@ module.exports = function (/* ctx */) {
       'addressbar-color',
       'routeguard',
       'EventBus',
-      'leaflet'
+      'leaflet',
+      'laravel-echo'
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css

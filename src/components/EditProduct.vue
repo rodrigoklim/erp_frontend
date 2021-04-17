@@ -132,13 +132,13 @@
               >
                 <div
                   v-if="props.row.status == 1"
-                  style="color:teal"
+                  style="color:teal;font-weight: bold!important"
                 >
                   Ativo
                 </div>
                 <div
                   v-else
-                  style="color:tomato"
+                  style="color:tomato;font-weight: bold!important"
                 >
                   Inativo
                 </div>
