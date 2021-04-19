@@ -19,6 +19,7 @@
     "mapbox-gl": "^2.1.1",
     "quasar": "^1.0.0",
     "v-mask": "^2.2.4",
+    "vue-html-to-paper": "^1.3.1",
     "vue-input-tag": "^2.0.7",
     "vue-mapbox": "^0.4.1",
     "vue-moment": "^4.1.0",

@@ -508,9 +508,10 @@ export default {
     },
     handlePolyline (data) {
       const self = this
+      const path = []
       this.route = []
       this.markers = []
-      var path = []
+      console.log(data.matrix[0])
       this.markers.push({
         value: latLng(data.matrix[0].markers.pointA.split(',').reverse())
       })

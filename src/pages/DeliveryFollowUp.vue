@@ -10,11 +10,16 @@
           >
             <q-card-section>
               <div class="row">
-                <div class="col-8">
+                <div class="col-6">
                   <div
                     class="text-h4"
                     style="color: #4DA3FE"
                   >Entregas</div>
+                </div>
+                <div class="col-6 " align="end">
+                  <div
+                    class="text-h5 q-mt-sm"
+                  >Rota#1 - São Paulo</div>
                 </div>
               </div>
             </q-card-section>
@@ -24,56 +29,7 @@
             />
             <div class="row justify-center items-start q-pa-sm">
               <div class="col-3">
-                <q-card
-                  dark
-                  class="q-ml-sm"
-                >
-                  <q-card-section>
-                    <div class="text-h5">Lista de Rotas</div>
-                  </q-card-section>
-                  <q-separator dark />
-                  <q-card-section>
-                    <q-list
-                      bordered
-                      separator
-                    >
-                      <q-item
-                        clickable
-                        v-ripple
-                        v-for="(delivery, index) in deliveries"
-                        :key="index"
-                      >
-                        <q-item-section top>
-                          <q-item-label
-                            lines="2"
-                            class="q-mt-sm text-h6"
-                          > {{delivery.zone}}</q-item-label>
-                        </q-item-section>
-                        <q-item-section top>
-                          <q-item-label
-                            lines="1"
-                            class="q-mt-sm"
-                          >
-                            <q-avatar
-                              icon="fas fa-truck"
-                              color="primary"
-                              size="sm"
-                            />
-                            BXY - Bolinha
-                          </q-item-label>
-                          <q-item-label lines="1">
-                            <q-avatar
-                              icon="sports_motorsports"
-                              color="primary"
-                              size="sm"
-                            />
-                            Juca Motorista
-                          </q-item-label>
-                        </q-item-section>
-                      </q-item>
-                    </q-list>
-                  </q-card-section>
-                </q-card>
+               <route-list @routePath="routePath"></route-list>
               </div>
               <div class="col-6">
                 <q-card
@@ -96,7 +52,7 @@
                       @update:zoom="zoomUpdate"
                     >
                       <l-tile-layer :url="url" />
-                      <!-- <l-marker
+                      <l-marker
                         ref="markers"
                         :lat-lng="marker.value"
                         v-for="marker, index in markers"
@@ -109,7 +65,7 @@
                         :key="polyline.index"
                         :lat-lngs="polyline.route"
                         :color="polyline.color"
-                      /> -->
+                      />
                     </l-map>
                   </q-card-section>
                 </q-card>
@@ -128,10 +84,6 @@
                       color="accent"
                       dark
                     >
-                      <q-timeline-entry
-                        heading
-                        body="Rota #1 - São Paulo"
-                      />
                       <q-timeline-entry
                         title="Cliente 1"
                         subtitle="07:23"
@@ -169,9 +121,9 @@
 </template>
 
 <script>
-import apiClient from 'src/services/api'
 import { latLng, Icon } from 'leaflet'
-import { LMap, LTileLayer } from 'vue2-leaflet'
+import { LMap, LTileLayer, LMarker, LPolyline } from 'vue2-leaflet'
+import RouteList from 'components/RouteList'
 
 delete Icon.Default.prototype._getIconUrl
 Icon.Default.mergeOptions({
@@ -182,8 +134,11 @@ Icon.Default.mergeOptions({
 export default {
   name: 'deliveryFollowUp',
   components: {
+    RouteList,
     LMap,
-    LTileLayer
+    LTileLayer,
+    LMarker,
+    LPolyline
   },
   data () {
     return {
@@ -201,37 +156,10 @@ export default {
         zoomSnap: 0.5
       },
       showMap: true,
-      center: [-23.5862689, -46.6830193]
+      center: [-23.5862689, -46.6830193],
+      route: [],
+      markers: []
     }
-  },
-  mounted () {
-    const url = '/route/delivery-list'
-    const config = {
-      headers: {
-        Authorization: 'Bearer ' + localStorage.token
-      }
-    }
-
-    apiClient.get(url, config).then(response => {
-      console.log(response.data)
-      this.deliveries = response.data
-    }).catch(error => {
-      if (error.response) {
-        // this.handleError()
-        this.submitting = false
-        console.log(error.response.data)
-        console.log(error.response.status)
-        console.log(error.response.headers)
-      } else if (error.request) {
-        // this.handleError()
-        this.submitting = false
-        console.log(error.request)
-      } else {
-        // Something happened in setting up the request and triggered an Error
-        // this.handleError()
-        console.log('Error', error.message)
-      }
-    })
   },
   methods: {
     zoomUpdate (zoom) {
@@ -239,6 +167,37 @@ export default {
     },
     centerUpdate (center) {
       this.currentCenter = center
+    },
+    routePath (newVal) {
+      this.handlePolyline(newVal)
+    },
+    handleMarkers (data) {
+      this.markers.push({
+        value: latLng(data.pointB.split(',').reverse())
+      })
+      const map = this.$refs.map.mapObject
+      // const markers = this.$refs.markers
+      map.fitBounds(this.markers.map(m => { return [m.value.lat, m.value.lng] }))
+      this.zoom = this.currentZoom - 2
+    },
+    handlePolyline (data) {
+      const self = this
+      this.route = []
+      this.markers = []
+      var path = []
+      this.markers.push({
+        value: latLng(data.matrix[0].markers.pointA.split(',').reverse())
+      })
+      data.matrix.forEach(function (item) {
+        self.handleMarkers(item.markers)
+        item.route.forEach(function (coords) {
+          path.push([coords[1], coords[0]])
+        })
+        self.route.push({
+          route: path,
+          color: 'purple'
+        })
+      })
     }
   }
 }

@@ -38,12 +38,16 @@
               name="routes"
               style="font-family: poppins; font-weight:800 !important; font-size: 20px; color:#007bff; opacity: 0.75"
             />
-            <q-route-tab
-              to="/entregas"
-              label="Entregas"
-              name="deliveryFollowUp"
-              style="font-family: poppins; font-weight:800 !important; font-size: 20px; color:#007bff; opacity: 0.75"
-            />
+            <div v-if="userData.role <= 1">
+              <q-route-tab
+                to="/entregas"
+                label="Entregas"
+                name="deliveryFollowUp"
+                style="font-family: poppins; font-weight:800 !important; font-size: 20px; color:#007bff; opacity: 0.75"
+              >
+                <q-badge color="red" floating v-if="newMessage > 0">{{ newMessage }}</q-badge>
+              </q-route-tab>
+            </div>
             <q-route-tab
               to="/page3"
               label="Manutenção"
@@ -93,12 +97,12 @@
             style="margin-top: 0.45em"
             no-caps
           >
-<!--            <q-icon-->
-<!--              name="notifications"-->
-<!--              color="red-6"-->
-<!--              style="cursor:pointer"-->
-<!--              @click="showNotif"-->
-<!--            />-->
+            <!--            <q-icon-->
+            <!--              name="notifications"-->
+            <!--              color="red-6"-->
+            <!--              style="cursor:pointer"-->
+            <!--              @click="showNotif"-->
+            <!--            />-->
 
             <q-btn-dropdown
               auto-close
@@ -153,50 +157,53 @@
 </template>
 
 <script>
-// import Echo from '../boot/laravel-echo'
+import EventBus from 'boot/EventBus'
 
 export default {
   name: 'MainLayout',
   data () {
     return {
       user: '',
-      tab: ''
+      userData: '',
+      tab: '',
+      newMessage: 0
     }
   },
   mounted () {
     this.user = localStorage.name
+    this.userData = JSON.parse(localStorage.user_data)
+    console.log(this.userData)
   },
   created () {
+    const self = this
     this.$q.addressbarColor.set('#181825')
     window.Echo.channel('notification-channel')
       .listen('ChecklistNotification', (e) => {
-        console.log(e)
+        this.notification(e.message)
       })
+
+    EventBus.$on('read', function () {
+      self.newMessage = self.newMessage - 1
+    })
+    EventBus.$on('loadChecklist', function (event) {
+      self.newMessage = event
+    })
   },
   methods: {
     logout () {
       this.$q.sessionStorage.set('logged', 'false')
       this.$router.push('/login')
     },
-    showNotif () {
+    notification (data) {
+      this.newMessage++
+      this.showNotif(data.title, data.message)
+    },
+    showNotif (title, message) {
       this.$q.notify({
-        message: 'Jim just pinged you.',
+        message: title,
+        caption: message,
         color: 'red-4',
-        position: 'top-right',
-        actions: [
-          {
-            label: 'Reply',
-            color: 'yellow',
-            handler: () => { /* ... */
-            }
-          },
-          {
-            label: 'Dismiss',
-            color: 'white',
-            handler: () => { /* ... */
-            }
-          }
-        ]
+        position: 'top-right'
       })
     }
   }
