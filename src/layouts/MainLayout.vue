@@ -158,6 +158,7 @@
 
 <script>
 import EventBus from 'boot/EventBus'
+import { SessionStorage } from 'quasar'
 
 export default {
   name: 'MainLayout',
@@ -172,7 +173,10 @@ export default {
   mounted () {
     this.user = localStorage.name
     this.userData = JSON.parse(localStorage.user_data)
-    console.log(this.userData)
+    const delivery = SessionStorage.getItem('deliveryFlag')
+    if (parseInt(delivery) > 0) {
+      this.newMessage = parseInt(delivery)
+    }
   },
   created () {
     const self = this
@@ -195,8 +199,10 @@ export default {
       this.$router.push('/login')
     },
     notification (data) {
-      this.newMessage++
-      this.showNotif(data.title, data.message)
+      if (!data.route) {
+        this.newMessage++
+        this.showNotif(data.title, data.message)
+      }
     },
     showNotif (title, message) {
       this.$q.notify({

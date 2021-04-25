@@ -135,6 +135,7 @@ export default {
           localStorage.userId = response.data.user.id
           localStorage.name = response.data.user.name
           localStorage.user_data = JSON.stringify(response.data.user)
+          this.$q.sessionStorage.set('deliveryFlag', response.data.delivery)
           this.$q.sessionStorage.set('logged', 'true')
           self.visible = false
           self.$router.push('/')

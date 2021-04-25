@@ -39,17 +39,17 @@
                           size="sm"
 
                 />
-                <q-avatar
+                <q-avatar v-if="lastCustomer[index]"
                   icon="fas fa-flag-checkered"
                   color="positive"
                   size="sm"
                 />
-                <q-avatar
+                <q-avatar v-if="hasChat"
                   icon="fas fa-comment-dots"
                   color="pink"
                   size="sm"
                 />
-                <q-avatar
+                <q-avatar v-if="mechanicAlert"
                   icon="fas fa-wrench"
                   color="red-6"
                   size="sm"
@@ -64,7 +64,7 @@
                   color="primary"
                   size="sm"
                 />
-                BXY - Bolinha
+                {{delivery.vehicleNickname}}
               </q-item-label>
               <q-item-label lines="1">
                 <q-avatar
@@ -72,7 +72,7 @@
                   color="primary"
                   size="sm"
                 />
-                Juca Motorista
+                {{delivery.driverName}}
               </q-item-label>
             </q-item-section>
           </q-item>
@@ -208,7 +208,10 @@ export default {
           sortable: false,
           auth: ''
         }
-      ]
+      ],
+      lastCustomer: [],
+      hasChat: false,
+      mechanicAlert: false
     }
   },
   mounted: function () {
@@ -243,8 +246,6 @@ export default {
   },
   methods: {
     routeClick (item) {
-      console.log(item)
-      console.log(this.loadChecklist)
       if (item.status === '3') {
         this.loadChecklist = true
         this.loadChecklistTable = [item.load_checklist]
@@ -252,6 +253,7 @@ export default {
         this.auth = item.id
         console.log(item.products)
       }
+      this.$emit('routeDetails', item)
       const url = '/route/ongoing'
       const config = {
         headers: {
@@ -266,14 +268,10 @@ export default {
         this.$emit('routePath', response.data)
       }).catch(error => {
         if (error.response) {
-          // this.handleError()
-          this.submitting = false
           console.log(error.response.data)
           console.log(error.response.status)
           console.log(error.response.headers)
         } else if (error.request) {
-          // this.handleError()
-          this.submitting = false
           console.log(error.request)
         } else {
           // Something happened in setting up the request and triggered an Error
@@ -296,10 +294,8 @@ export default {
         data: this.auth
       }
       apiClient.post(url, params, config).then(response => {
-        console.log(response.data)
-        EventBus.$emit('read', 'oi')
+        EventBus.$emit('read', 0)
         this.deliveries = response.data
-        this.loadChecklist = !this.loadChecklist
       }).catch(error => {
         if (error.response) {
           // this.handleError()
@@ -317,15 +313,31 @@ export default {
           console.log('Error', error.message)
         }
       })
+      this.sendAuthNotification(this.auth)
     },
     notify () {
+      const self = this
       let control = 0
+      let d = 0
       this.deliveries.forEach(function (item) {
         if (item.status === '3') {
           control++
         }
+        self.endRoute(item.route_order, d)
+        d++
       })
       EventBus.$emit('loadChecklist', control)
+    },
+    endRoute (data, i) {
+      let control = 0
+      data.forEach(function (item) {
+        if (item.status === '1') {
+          control++
+        }
+      })
+      if ((data.length - parseInt(control)) === 0) {
+        this.lastCustomer[i] = !this.lastCustomer[i]
+      }
     },
     askAuth (auth) {
       this.$q.notify({
@@ -334,10 +346,52 @@ export default {
         message: 'Deseja  autorizar a saída do veículo?',
         position: 'center',
         actions: [
-          { label: 'Não', color: 'negative', handler: () => { this.loadChecklist = !this.loadChecklist } },
-          { label: 'Sim', color: 'yellow', handler: () => { this.authorize(auth) } }
+          {
+            label: 'Não',
+            color: 'negative',
+            handler: () => {
+              this.loadChecklist = !this.loadChecklist
+            }
+          },
+          {
+            label: 'Sim',
+            color: 'yellow',
+            handler: () => {
+              this.loadChecklist = !this.loadChecklist
+              this.authorize(auth)
+            }
+          }
         ],
         timeout: Math.random() * 5000 + 3000
+      })
+    },
+    sendAuthNotification (value) {
+      const url = '/route/auth/notify'
+      const config = {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.token
+        }
+      }
+      const params = {
+        data: value
+      }
+      apiClient.post(url, params, config).then(response => {
+      }).catch(error => {
+        if (error.response) {
+          // this.handleError()
+          this.submitting = false
+          console.log(error.response.data)
+          console.log(error.response.status)
+          console.log(error.response.headers)
+        } else if (error.request) {
+          // this.handleError()
+          this.submitting = false
+          console.log(error.request)
+        } else {
+          // Something happened in setting up the request and triggered an Error
+          // this.handleError()
+          console.log('Error', error.message)
+        }
       })
     }
   }
