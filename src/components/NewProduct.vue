@@ -201,6 +201,47 @@
                 </q-field>
               </q-card>
             </div>
+             <div class="col">
+              <q-card
+                dark
+                class="q-ml-sm"
+              >
+                <q-field
+                  dark
+                  ref="customer_unity"
+                  outlined
+                  v-model="product.customer_unity"
+                  label="Alterar Unidade no Cliente"
+                  stack-label
+                  class="text-uppercase"
+                >
+                  <template v-slot:control>
+                    <div
+                      class="self-center full-width no-outline"
+                      tabindex="0"
+                    >
+                      <div class="row">
+                        <q-radio
+                          dark
+                          v-model="product.customer_unity"
+                          val="1"
+                          label="Sim"
+                        />
+                      </div>
+                      <div class="row">
+                        <q-radio
+                        v-model="product.customer_unity"
+                          dark
+                          val="0"
+                          label="Não"
+                        />
+                      </div>
+                    </div>
+                  </template>
+
+                </q-field>
+              </q-card>
+            </div>
           </div>
           <div class="row">
             <div class="col q-mr-sm">
@@ -396,7 +437,8 @@ export default {
         csosn: '',
         weight: '',
         operation: '',
-        cest: ''
+        cest: '',
+        customer_unity: ''
       },
       ncmList: [],
       stringOptions: '',

@@ -24,6 +24,9 @@
                   map-options
                   dark
                   @input="productsDetails(); btnDisabled = false"
+                  @filter="productSelection"
+                  use-input
+                  input-debounce="0"
                 />
               </div>
             </div>
@@ -52,6 +55,14 @@
                       label="Preço para o Cliente"
                       :rules="[val => !!val || 'Campo obrigatório.']"
                     />
+                  </q-card-section>
+                  <q-card-section v-if="cUnity">
+                  <q-field outlined dark label="Unidade para Cliente" stack-label>
+                    <template v-slot:control>
+                      <q-radio dark v-model="unity" val="m3" label="m3" />
+                      <q-radio dark v-model="unity" val="lts" label="Litros" />
+                    </template>
+                  </q-field>
                   </q-card-section>
                   <q-card-section>
                     <div class="row">
@@ -89,13 +100,17 @@
                           />
                         </div>
                         <div class="row">
-                          <q-input
+                          <q-select
                             class="q-mt-md"
                             style="width: 100%;"
                             v-model="recurrenceExactDay"
+                            :options="ExactDayOptions"
+                            use-chips
+                            multiple
                             outlined
+                            map-options
+                            emit-value
                             :readonly="recurrence == 'interval' || recurrence == ''"
-                            suffix="do mês"
                             dark
                             label="Dia Exato"
                           />
@@ -247,7 +262,7 @@
               title="Produtos Selecionados"
               :data="data"
               :columns="columns"
-              row-key="name"
+              row-key="index"
               dark
               color="amber"
               style="font-family:poppins; font-weight: 300;"
@@ -282,13 +297,19 @@
                     {{ props.row.exactDay }}
                   </q-td>
                   <q-td
+                    key="unity"
+                    :props="props"
+                  >
+                    {{ props.row.unity }}
+                  </q-td>
+                  <q-td
                     key="editRow"
                     :props="props"
                   >
                     <q-btn
                       size="sm"
                       round
-                      @click="deleteProduct(index)"
+                      @click="deleteProduct(props.row)"
                       icon="clear"
                       color="red-7"
                     />
@@ -305,6 +326,7 @@
 
 <script>
 import apiClient from 'src/services/api'
+
 export default {
   name: 'productSelect',
   props: {
@@ -319,13 +341,23 @@ export default {
       recurrence: '',
       costumerPrice: '',
       recurrenceInterval: '',
-      recurrenceExactDay: '',
+      recurrenceExactDay: [],
+      unity: '',
+      cUnity: false,
       productSelected: false,
       priceTag: '',
       btnDisabled: true,
+      productListOptions: [],
       recurrenceOptions: [
         { value: 'interval', label: 'Intervalo' },
         { value: 'exactDay', label: 'Dia Exato' }
+      ],
+      ExactDayOptions: [
+        { label: 'Segunda', value: 1 },
+        { label: 'Terça', value: 2 },
+        { label: 'Quarta', value: 3 },
+        { label: 'Quinta', value: 4 },
+        { label: 'Sexta', value: 5 }
       ],
       info: {
         max_price: '',
@@ -340,6 +372,7 @@ export default {
         { name: 'price', align: 'center', label: 'Preço', field: 'price' },
         { name: 'interval', align: 'center', label: 'Intervalo', field: 'interval' },
         { name: 'exactDay', align: 'center', label: 'Dia Exato', field: 'exactDay' },
+        { name: 'unity', align: 'center', label: 'Unidade', field: 'unity' },
         { name: 'editRow' }
       ],
       data: []
@@ -361,7 +394,7 @@ export default {
         var category = response.data[key].category.toUpperCase()
         var product = category + ' | ' + response.data[key].product.toUpperCase()
 
-        self.productList.push({
+        self.productListOptions.push({
           value: key,
           label: product,
           disable: false
@@ -383,6 +416,24 @@ export default {
       this.info.unity = this.products[this.product].unity
       this.info.max_price = parseFloat(price)
       this.priceTag = true
+      if (this.products[this.product].customer_unity === '1') {
+        this.cUnity = true
+      } else {
+        this.cUnity = false
+      }
+    },
+    productSelection (val, update) {
+      if (val === '') {
+        update(() => {
+          this.productList = this.productListOptions
+        })
+        return
+      }
+
+      update(() => {
+        const needle = val.toLowerCase()
+        this.productList = this.productListOptions.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
+      })
     },
     addProduct () {
       var e = this.$refs.cPrice.validate()
@@ -391,15 +442,19 @@ export default {
       }
       var interval = ''
       var eDay = ''
-      if (this.recurrenceInterval === '' && this.recurrenceExactDay === '') {
+      if (this.recurrenceInterval === '' && this.recurrenceExactDay.length === 0) {
         interval = '-'
         eDay = '-'
       } else if (this.recurrenceInterval === '') {
         interval = '-'
         eDay = this.recurrenceExactDay
-      } else if (this.recurrenceExactDay === '') {
+      } else if (this.recurrenceExactDay.length === 0) {
         eDay = '-'
         interval = this.recurrenceInterval
+      }
+
+      if (this.products[this.product].customer_unity === null) {
+        this.unity = '-'
       }
 
       const pSelected = {
@@ -407,12 +462,14 @@ export default {
         product: this.productList[this.product].label,
         price: this.costumerPrice,
         interval: interval,
-        exactDay: eDay
+        exactDay: eDay,
+        unity: this.unity,
+        index: this.product
       }
-
       this.data.push(pSelected)
       this.clearFields()
       this.productList[this.product].disable = true
+      this.product = ''
     },
     edit () {
       const p = this.editProducts
@@ -421,29 +478,35 @@ export default {
       Object.keys(p).forEach((k) => {
         Object.keys(pList).forEach((key) => {
           if (parseInt(pList[key].id) === parseInt(p[k].products_id)) {
-            const price = pList[key].max_price * p[k].price
+            const price = (pList[key].max_price * p[k].price) / 100
             self.data.push({
               id: p[k].products_id,
               product: pList[key].category.toUpperCase() + ' | ' + pList[key].product,
               price: 'R$ ' + price.toFixed(2),
               interval: p[k].interval,
-              exactDay: p[k].exact_day
+              exactDay: p[k].exact_day,
+              unity: p[k].unity
             })
-            this.productList[key].disable = true
+            this.productListOptions[key].disable = true
           }
         })
       })
 
       this.$forceUpdate()
     },
-    deleteProduct (i) {
-      this.data.splice(i, 1)
-      this.productList[this.product].disable = false
+    deleteProduct (o) {
+      const p = this.data
+      Object.keys(p).forEach((k) => {
+        if (p[k].id === o.id) {
+          this.productList[parseInt(o.index)].disable = false
+          p.splice(k, 1)
+        }
+      })
     },
     clearFields () {
       this.costumerPrice = ''
       this.recurrenceInterval = ''
-      this.recurrenceExactDay = ''
+      this.recurrenceExactDay = []
       this.recurrence = ''
       this.info.operation = ''
       this.info.category = ''

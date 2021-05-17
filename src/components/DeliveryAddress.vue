@@ -293,6 +293,7 @@ export default {
     }
   },
   mounted () {
+    console.log(this.company)
     this.control++
     this.size.push('a')
     this.readonly[this.control - 1] = true
@@ -324,23 +325,44 @@ export default {
         return false
       }
     },
-    update () {
-      // just set reactive property
-    },
     handleFillAddress () {
       const sentAddress = this.fillAddress
       const i = (this.control - 1)
-      this.address[i].street = sentAddress.logradouro.toUpperCase()
-      this.address[i].number = sentAddress.numero
-      this.address[i].district = sentAddress.bairro.toUpperCase()
-      this.address[i].complement = sentAddress.complemento.toUpperCase()
-      this.address[i].zipCode = sentAddress.cep
-      this.address[i].city = sentAddress.municipio.toUpperCase()
-      this.address[i].city_code = sentAddress.ibge.codigo_municipio
-      this.address[i].state = sentAddress.uf.toUpperCase()
+      if (sentAddress.street) {
+        this.address[i].street = sentAddress.street.toUpperCase(
+        )
+      }
+
+      if (sentAddress.number) {
+        this.address[i].number = sentAddress.number
+      }
+
+      if (sentAddress.neighborhood) {
+        this.address[i].district = sentAddress.neighborhood.toUpperCase()
+      }
+
+      if (sentAddress.details) {
+        this.address[i].complement = sentAddress.details.toUpperCase()
+      }
+
+      if (sentAddress.zip) {
+        this.address[i].zipCode = sentAddress.zip
+      }
+
+      if (sentAddress.city) {
+        this.address[i].city = sentAddress.city.toUpperCase()
+      }
+
+      if (sentAddress.city_ibge) {
+        this.address[i].city_code = sentAddress.city_ibge
+      }
+
+      if (sentAddress.state) {
+        this.address[i].state = sentAddress.state.toUpperCase()
+      }
       this.geolocation(i)
-      this.city_search[i] = sentAddress.ibge.codigo_municipio
-      this.state_search[i] = sentAddress.uf
+      this.city_search[i] = sentAddress.city_ibge
+      this.state_search[i] = sentAddress.state
     },
     zoneValue (zone) {
       const i = this.zoneControl

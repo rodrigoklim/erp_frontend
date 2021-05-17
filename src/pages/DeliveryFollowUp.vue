@@ -16,10 +16,11 @@
                     style="color: #4DA3FE"
                   >Entregas</div>
                 </div>
-                <div class="col-6 " align="end">
-                  <div
-                    class="text-h5 q-mt-sm"
-                  >{{title}}</div>
+                <div
+                  class="col-6 "
+                  align="end"
+                >
+                  <div class="text-h5 q-mt-sm">{{title}}</div>
                 </div>
               </div>
             </q-card-section>
@@ -29,7 +30,11 @@
             />
             <div class="row justify-center items-start q-pa-sm">
               <div class="col-3">
-               <route-list @routePath="routePath" @routeDetails="routeDetails" style="opacity: 0.85"></route-list>
+                <route-list
+                  @routePath="routePath"
+                  @routeDetails="routeDetails"
+                  style="opacity: 0.85"
+                ></route-list>
               </div>
               <div class="col-6">
                 <q-card
@@ -60,14 +65,14 @@
                         :icon="marker.icon"
                       />
                       <div v-if="truck.set">
-                      <l-marker :lat-lng="truck.coords">
-                        <l-icon
-                          :icon-size="[35, 35]"
-                          :icon-anchor="[10,10]"
-                          :icon-url="require('../assets/img/tank_truck.svg')"
-                          color="primary"
-                        />
-                      </l-marker>
+                        <l-marker :lat-lng="truck.coords">
+                          <l-icon
+                            :icon-size="[35, 35]"
+                            :icon-anchor="[10,10]"
+                            :icon-url="require('../assets/img/tank_truck.svg')"
+                            color="primary"
+                          />
+                        </l-marker>
                       </div>
                       <l-polyline
                         v-for="polyline in route"
@@ -80,7 +85,10 @@
                 </q-card>
               </div>
               <div class="col-3">
-               <delivery-route :routeOrder="customers"></delivery-route>
+                <delivery-route
+                  :routeOrder="customers"
+                  :routeNextCostumers='next'
+                ></delivery-route>
               </div>
             </div>
           </q-card>
@@ -137,7 +145,8 @@ export default {
       customers: [],
       control: 0,
       truck: [],
-      truckIcon: null
+      truckIcon: null,
+      next: []
     }
   },
   methods: {
@@ -148,7 +157,19 @@ export default {
       this.currentCenter = center
     },
     routePath (newVal) {
-      this.handlePolyline(newVal.matrix)
+      const url = '/route/live'
+      const config = {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.token
+        }
+      }
+      const params = {
+        data: newVal.routeOrder[0].route_id
+      }
+      apiClient.post(url, params, config).then(response => {
+        this.handlePolyline(response.data)
+        this.next = response.data
+      })
       this.customers = newVal.routeOrder
       this.getPosition()
       this.makePeriodic()
@@ -157,22 +178,15 @@ export default {
       this.markers.push({
         value: latLng(data.pointB.split(',').reverse())
       })
-      const map = this.$refs.map.mapObject
-      // const markers = this.$refs.markers
-      map.fitBounds(this.markers.map(m => {
-        return [m.value.lat, m.value.lng]
-      }))
-      this.zoom = this.currentZoom - 2
+      this.center = this.truck.coords
     },
     handlePolyline (data) {
       const self = this
       this.route = []
       this.markers = []
       const path = []
-      console.log(data.matrix[0].markers.pointA)
-      this.markers.push({
-        value: latLng(data.matrix[0].markers.pointA.split(',').reverse())
-      })
+      this.truck.coords = latLng(data.matrix[0].markers.pointA.split(',').reverse())
+
       data.matrix.forEach(function (item) {
         self.handleMarkers(item.markers)
         item.route.forEach(function (coords) {
@@ -198,11 +212,10 @@ export default {
       const params = {
         data: item
       }
-      console.log(params)
       apiClient.post(url, params, config).then(response => {
-        console.log(response.data)
         this.truck.coords = latLng(response.data[1], response.data[0])
         this.truck.set = true
+        this.$forceUpdate()
       }).catch(error => {
         if (error.response) {
           console.log(error.response.data)
@@ -222,7 +235,6 @@ export default {
       setInterval(
         function () {
           self.control = 0
-          console.log('zerando', self.control)
           self.getPosition()
         },
         1000 *

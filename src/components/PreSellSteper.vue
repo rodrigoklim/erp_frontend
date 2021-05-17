@@ -43,7 +43,7 @@
           <template v-slot:body-cell-flag="props">
             <q-td :props="props">
               <q-icon
-                v-if="props.row.register[0].account.financial_flag == 1"
+                v-if="props.row.account.financial_flag == 1"
                 name="fas fa-exclamation-circle"
                 color="red-6"
                 size="sm"
@@ -59,7 +59,7 @@
                 <div @loadeddata="console.log(props)"></div>
               </q-icon>
               <q-icon
-                v-if="props.row.register[0].account.remittance_flag == 1"
+                v-if="props.row.account.remittance_flag == 1"
                 name="fas fa-exclamation-triangle"
                 color="yellow-9"
                 size="sm"
@@ -338,7 +338,15 @@ export default {
       }
     }
     apiClient.get(url, data).then(response => {
-      self.costumers = response.data
+      self.costumers = response.data[0]
+      console.log(this.costumers)
+      if (response.data[1]) {
+        response.data[1].forEach(function (value) {
+          console.log(value)
+          self.costumers.push(value)
+        })
+      }
+      console.log(this.costumers)
       self.visible = false
     }).catch(error => {
       if (error.response) {

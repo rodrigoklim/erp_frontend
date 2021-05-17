@@ -33,8 +33,8 @@
                   style="width: 100%;"
                   v-model="form.ie"
                   outlined
-                  dark
                   readonly
+                  dark
                   label="Inscrição Estadual"
                 />
               </div>
@@ -107,6 +107,8 @@
                             v-model="form.nf"
                             color="teal"
                             indeterminate-value="false"
+                            false-value="false"
+                            true-value="true"
                             size="lg"
                             checked-icon="check"
                             unchecked-icon="clear"
@@ -339,7 +341,7 @@ import InputTag from 'vue-input-tag'
 import PaymentMethods from './PaymentMethods.vue'
 import DeliveryAddress from './DeliveryAddress.vue'
 import ProductSelect from './ProductSelect.vue'
-import { scroll } from 'quasar'
+import { scroll, throttle } from 'quasar'
 import apiClient from 'src/services/api'
 
 const { getScrollTarget, setScrollPosition } = scroll
@@ -388,18 +390,23 @@ export default {
   },
   methods: {
     companyData (data) {
-      this.form.cnpj = data.cnpj
-      this.form.ie = data.inscricao_estadual
-      this.form.corporate_name = data.nome_empresarial.toUpperCase()
-      this.form.company_name = data.nome_fantasia.toUpperCase()
-      this.form.register_situation = data.situacao_cnpj.toUpperCase()
-      this.addressSent = data
+      this.form.cnpj = data.tax_id
+      if (data.sintegra.home_state_registration) {
+        this.form.ie = data.sintegra.home_state_registration
+      } else {
+        this.form.ie = 'ISENTO'
+      }
+      this.form.corporate_name = data.name.toUpperCase()
+      this.form.register_situation = data.registration.status.toUpperCase()
+      this.addressSent = data.address
     },
     numbers (phoneNumbers) {
       this.form.phone = phoneNumbers
     },
+    redirect () {
+      this.$emit('customerCreated', 'edit')
+    },
     beforeSubmit () {
-      // nf toggle validation
       this.submitting = true
       if (this.form.nf === '') {
         const el = this.$refs.nf.$el
@@ -431,6 +438,7 @@ export default {
       }, 800)
     },
     submit () {
+      this.$emit('customerCreated', 'edit')
       const url = '/costumer/le/create'
       const data = {
         params: {
@@ -448,24 +456,22 @@ export default {
       apiClient.post(url, data, config).then(response => {
         if (response.data === 'ok') {
           this.submitting = false
-          this.$router.push('/', () => {
-            this.$q.notify({
-              color: 'teal',
-              icon: 'check',
-              message: 'Cliente Cadastrado com sucesso!',
-              position: 'top-right'
-            })
+          this.$q.notify({
+            color: 'teal',
+            icon: 'check',
+            message: 'Cliente Cadastrado com sucesso!',
+            position: 'top-right'
           })
+          this.redirect()
         } else {
           this.submitting = false
-          this.$router.push('/clientes', () => {
-            this.$q.notify({
-              color: 'tomato',
-              icon: 'warning',
-              message: 'Cliente não cadastrado, verifique os dados!',
-              position: 'top-right'
-            })
+          this.$q.notify({
+            color: 'tomato',
+            icon: 'warning',
+            message: 'Cliente não cadastrado, verifique os dados!',
+            position: 'top-right'
           })
+          this.redirect()
         }
         // console.log(response.data)
       }).catch(error => {
@@ -485,7 +491,7 @@ export default {
           console.log(error.request)
         } else {
           // Something happened in setting up the request and triggered an Error
-          this.handleError()
+          // this.handleError()
           console.log('Error', error.message)
         }
       })
@@ -549,6 +555,7 @@ export default {
     }
   },
   mounted () {
+    this.submit = throttle(this.submit, 500)
     this.company = 'le'
     const self = this
     const url = '/costumer/le/list'

@@ -159,6 +159,9 @@ import apiClient from 'src/services/api'
 export default {
   components: { PreSellSteper },
   name: 'PreSell',
+  props: {
+    ongoing: null
+  },
   data () {
     return {
       presell: {
@@ -268,6 +271,12 @@ export default {
       }
     })
     localStorage.payCode = false
+  },
+  watch: {
+    ongoing: function (newVal, oldVal) {
+      console.log(newVal, oldVal)
+      console.log('oi')
+    }
   }
 }
 </script>

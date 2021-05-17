@@ -23,6 +23,8 @@
 </template>
 <script>
 import apiClient from 'src/services/api'
+import { throttle } from 'quasar'
+
 export default {
   name: 'SearchCnpj',
   data () {
@@ -102,13 +104,13 @@ export default {
     },
     searchSintegra (cnpj) {
       const self = this
-      this.$axios.get('https://www.sintegraws.com.br/api/v1/execute-api.php', {
-        params: {
-          cnpj: cnpj,
-          token: '315B1A90-8F61-4328-8635-CD4573979CBB',
-          plugin: 'ST'
+      const config = {
+        headers: {
+          'x-rapidapi-key': '72bd2565f8msh6cb15839d744453p1c01cfjsnd6aa9d69201a',
+          'x-rapidapi-host': 'consulta-cnpj-gratis.p.rapidapi.com'
         }
-      }).then(response => {
+      }
+      this.$axios.get('https://consulta-cnpj-gratis.p.rapidapi.com/companies/' + cnpj, config).then(response => {
         self.loadingState = false
         this.$emit('update', response.data)
       }).catch(error => {
@@ -141,6 +143,9 @@ export default {
         console.log('error', error)
       })
     }
+  },
+  created () {
+    this.searchSintegra = throttle(this.searchSintegra, 500)
   }
 }
 </script>

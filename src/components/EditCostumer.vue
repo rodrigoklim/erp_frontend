@@ -322,7 +322,7 @@
                         clickable
                         v-ripple
                       >
-                        <q-item-section>{{address.street.toUpperCase()}}, {{address.number.toUpperCase()}}, {{address.complement.toUpperCase()}}, {{address.city.toUpperCase()}} - {{address.state.toUpperCase()}}</q-item-section>
+                        <q-item-section>{{address.full_address.toUpperCase()}}</q-item-section>
                         <q-item-section
                           avatar
                           @click="deleteAddress(index)"
@@ -389,7 +389,7 @@
                   <div class="text-h4 q-mb-md">Método de Pagamento</div>
 
                   <div v-if="!editedPay">
-                    <div class="text-caption">{{costumer.register[0].pay_method.payment_description}}</div>
+                    <div class="text-caption">{{costumer.pay_method.payment_description}}</div>
                     <div class="row">
                       <div class="col">
                         <payment-methods
@@ -627,9 +627,9 @@ export default {
       console.log(this.submitData)
     },
     productPicked (data) {
-      this.costumer.register[0].products = ''
-      this.costumer.register[0].products = data
-      console.log(this.costumer.register[0].products = data)
+      this.costumer.products = ''
+      this.costumer.products = data
+      console.log(this.costumer.products = data)
       this.submitData.products = data
       this.editProducts = data
       this.edited = true
@@ -647,8 +647,8 @@ export default {
       this.editedRegister = true
     },
     paymentMethod (data) {
-      this.costumer.register[0].payment = ''
-      this.costumer.register[0].payment = data
+      this.costumer.payment = ''
+      this.costumer.payment = data
       this.submitData.payment = data
       this.editedPay = true
     },
@@ -733,68 +733,68 @@ export default {
     const c = this.costumer
     this.company = id[0]
     this.form.company_name = c.company_name
-    this.editPayment = c.register[0].pay_method
-    this.editProducts = c.register[0].products
-    if (c.register[0].account.nf === '1') {
+    this.editPayment = c.pay_method
+    this.editProducts = c.products
+    if (c.account.nf === '1') {
       this.form.nf = true
     } else {
       this.form.nf = false
     }
     if (id[0] === 'np') {
       this.form.company_type = 'matriz'
-      this.form.contact = c.register[0].name
+      this.form.contact = c.name
     } else {
-      this.form.company_type = c.register[0].company_type
-      this.form.contact = c.register[0].contact
+      this.form.company_type = c.company_type
+      this.form.contact = c.contact
     }
 
-    const emailBD = c.register[0].email.split(';')
+    const emailBD = c.email.split(';')
 
     Object.keys(emailBD).forEach((key) => {
       this.form.email.push(emailBD[key])
     })
 
-    this.addressList = c.register[0].address
+    this.addressList = c.address
 
-    if (c.register[0].phone_5) {
+    if (c.phone_5) {
       this.phones.push(
-        [c.register[0].phone_5, c.register[0].phone_5zap],
-        [c.register[0].phone_4, c.register[0].phone_4zap],
-        [c.register[0].phone_3, c.register[0].phone_3zap],
-        [c.register[0].phone_2, c.register[0].phone_2zap],
-        [c.register[0].phone_1, c.register[0].phone_1zap]
+        [c.phone_5, c.phone_5zap],
+        [c.phone_4, c.phone_4zap],
+        [c.phone_3, c.phone_3zap],
+        [c.phone_2, c.phone_2zap],
+        [c.phone_1, c.phone_1zap]
       )
       return false
     }
 
-    if (c.register[0].phone_4) {
+    if (c.phone_4) {
       this.phones.push(
-        [c.register[0].phone_4, c.register[0].phone_4zap],
-        [c.register[0].phone_3, c.register[0].phone_3zap],
-        [c.register[0].phone_2, c.register[0].phone_2zap],
-        [c.register[0].phone_1, c.register[0].phone_1zap]
+        [c.phone_4, c.phone_4zap],
+        [c.phone_3, c.phone_3zap],
+        [c.phone_2, c.phone_2zap],
+        [c.phone_1, c.phone_1zap]
       )
       return false
     }
 
-    if (c.register[0].phone_3) {
+    if (c.phone_3) {
       this.phones.push(
-        [c.register[0].phone_3, c.register[0].phone_3zap],
-        [c.register[0].phone_2, c.register[0].phone_2zap],
-        [c.register[0].phone_1, c.register[0].phone_1zap]
+        [c.phone_3, c.phone_3zap],
+        [c.phone_2, c.phone_2zap],
+        [c.phone_1, c.phone_1zap]
       )
       return false
     }
-    if (c.register[0].phone_2) {
+    if (c.phone_2) {
       this.phones.push(
-        [c.register[0].phone_2, c.register[0].phone_2zap],
-        [c.register[0].phone_1, c.register[0].phone_1zap]
+        [c.phone_2, c.phone_2zap],
+        [c.phone_1, c.phone_1zap]
       )
       return false
     }
 
-    if (c.register[0].phone_1) {
-      this.phones.push([c.register[0].phone_1, c.register[0].phone_1zap])
+    if (c.phone_1) {
+      this.phones.push([c.phone_1, c.phone_1zap])
       return false
     }
   }

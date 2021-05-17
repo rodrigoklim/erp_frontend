@@ -45,7 +45,11 @@
                 name="deliveryFollowUp"
                 style="font-family: poppins; font-weight:800 !important; font-size: 20px; color:#007bff; opacity: 0.75"
               >
-                <q-badge color="red" floating v-if="newMessage > 0">{{ newMessage }}</q-badge>
+                <q-badge
+                  color="red"
+                  floating
+                  v-if="newMessage > 0"
+                >{{ newMessage }}</q-badge>
               </q-route-tab>
             </div>
             <q-route-tab
@@ -63,14 +67,13 @@
               name="register"
               style="font-family: poppins; font-weight:800 !important; font-size: 14px; color:#007bff; opacity: 0.75"
             >
-              <q-list
-                style="background-color: #181825;font-family: poppins; font-weight:800 !important; font-size: 14px; color:#007bff; opacity: 0.75">
+              <q-list style="background-color: #181825;font-family: poppins; font-weight:800 !important; font-size: 14px; color:#007bff; opacity: 0.75">
                 <q-item
                   clickable
                   to="/clientes"
                   name="costumer"
                 >
-                  <q-item-section>Cliente</q-item-section>
+                  <q-item-section>Clientes</q-item-section>
                 </q-item>
                 <q-item
                   clickable
@@ -112,8 +115,7 @@
               no-caps
               style="font-family: poppins; font-weight:800; font-size: 14px; color:#007bff; opacity: 0.75; width: 175px"
             >
-              <q-list
-                style="background-color: #181825;font-family: poppins; font-weight:800; font-size: 14px; color:#007bff; opacity: 0.75">
+              <q-list style="background-color: #181825;font-family: poppins; font-weight:800; font-size: 14px; color:#007bff; opacity: 0.75">
                 <q-item
                   clickable
                   @click='logout'
@@ -136,7 +138,7 @@
     </q-header>
 
     <q-page-container style="background-color:#141414">
-      <router-view/>
+      <router-view />
     </q-page-container>
 
     <!-- <q-footer
