@@ -97,7 +97,6 @@ export default {
       const e = this.validateCPF(this.cpf)
       this.loadingState = true
       this.$refs.cpf.validate()
-      console.log(this.birthdate)
       if (e === true) {
         this.$refs.cpf.validate()
         this.uniqueSearch(this.cpf)

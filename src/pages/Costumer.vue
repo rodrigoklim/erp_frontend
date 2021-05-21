@@ -301,7 +301,7 @@
                 name='np'
                 style="background-color:#1d1d1d"
               >
-                <natural-person></natural-person>
+                <natural-person @customerCreated="customerCreated"></natural-person>
               </q-tab-panel>
             </q-tab-panels>
           </q-card-section>
@@ -370,42 +370,7 @@ export default {
     }
   },
   mounted () {
-    this.visible = true
-    const self = this
-    const url = '/costumer/show'
-    const data = {
-      headers: {
-        Authorization: 'Bearer ' + localStorage.token
-      }
-    }
-    apiClient.get(url, data).then(response => {
-      console.log(response.data)
-      const data = response.data
-      let i
-      for (i = 0; i < 2; i++) {
-        console.log(data[i])
-        data[i].forEach(function (c) {
-          self.customers.push(c)
-        })
-      }
-      self.visible = false
-    }).catch(error => {
-      if (error.response) {
-        this.handleError()
-        this.submitting = false
-        console.log(error.response.data)
-        console.log(error.response.status)
-        console.log(error.response.headers)
-      } else if (error.request) {
-        this.handleError()
-        this.submitting = false
-        console.log(error.request)
-      } else {
-        // Something happened in setting up the request and triggered an Error
-        this.handleError()
-        console.log('Error', error.message)
-      }
-    })
+    this.mountlist()
   },
   methods: {
     handleError () {
@@ -416,8 +381,42 @@ export default {
         position: 'top-right'
       })
     },
-    editCustomer (val) {
-      console.log(val)
+    mountlist () {
+      this.visible = true
+
+      const self = this
+      const url = '/costumer/show'
+      const params = {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.token
+        }
+      }
+      apiClient.get(url, params).then(response => {
+        const data = response.data
+        let i
+        for (i = 0; i < 2; i++) {
+          data[i].forEach(function (c) {
+            self.customers.push(c)
+          })
+        }
+        self.visible = false
+      }).catch(error => {
+        if (error.response) {
+          this.handleError()
+          this.submitting = false
+          console.log(error.response.data)
+          console.log(error.response.status)
+          console.log(error.response.headers)
+        } else if (error.request) {
+          this.handleError()
+          this.submitting = false
+          console.log(error.request)
+        } else {
+          // Something happened in setting up the request and triggered an Error
+          this.handleError()
+          console.log('Error', error.message)
+        }
+      })
     },
     costumerDetails (evt, row, index) {
       this.company_name = row.company_name
@@ -445,6 +444,8 @@ export default {
     },
     customerCreated (value) {
       this.tab = value
+      this.customers = []
+      this.mountlist()
     }
   }
 }

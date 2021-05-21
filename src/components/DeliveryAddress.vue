@@ -293,7 +293,6 @@ export default {
     }
   },
   mounted () {
-    console.log(this.company)
     this.control++
     this.size.push('a')
     this.readonly[this.control - 1] = true

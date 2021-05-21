@@ -57,12 +57,34 @@
                     />
                   </q-card-section>
                   <q-card-section v-if="cUnity">
-                  <q-field outlined dark label="Unidade para Cliente" stack-label>
-                    <template v-slot:control>
-                      <q-radio dark v-model="unity" val="m3" label="m3" />
-                      <q-radio dark v-model="unity" val="lts" label="Litros" />
-                    </template>
-                  </q-field>
+                    <q-field
+                      outlined
+                      dark
+                      bottom-slots
+                      :value="unity"
+                      ref="unity"
+                      label="Unidade para Cliente"
+                      stack-label
+                      :rules="[val => !!val]"
+                    >
+                      <template v-slot:control>
+                        <q-radio
+                          dark
+                          v-model="unity"
+                          val="m3"
+                          label="m3"
+                        />
+                        <q-radio
+                          dark
+                          v-model="unity"
+                          val="lts"
+                          label="Litros"
+                        />
+                      </template>
+                      <template v-slot:error>
+                        Campo obrigatório.
+                      </template>
+                    </q-field>
                   </q-card-section>
                   <q-card-section>
                     <div class="row">
@@ -134,9 +156,9 @@
                       <div
                         class="text q-ma-none"
                         style="font-family:poppins; font-weight: 300; font-size:18px"
-                        v-if="product !== ''"
+                        v-if="product !== null"
                       >
-                        {{productList[product].label}}
+                        {{productListOptions[product].label}}
                       </div>
                       <div
                         class="text q-ma-none"
@@ -291,6 +313,14 @@
                     {{ props.row.interval }}
                   </q-td>
                   <q-td
+                    v-if="Array.isArray(props.row.exactDay)"
+                    key="exactDay"
+                    :props="props"
+                  >
+                    {{ props.row.exactDay.join(', ') }}
+                  </q-td>
+                  <q-td
+                    v-else
                     key="exactDay"
                     :props="props"
                   >
@@ -336,7 +366,7 @@ export default {
   data () {
     return {
       products: [],
-      product: '',
+      product: null,
       productList: [],
       recurrence: '',
       costumerPrice: '',
@@ -353,11 +383,11 @@ export default {
         { value: 'exactDay', label: 'Dia Exato' }
       ],
       ExactDayOptions: [
-        { label: 'Segunda', value: 1 },
-        { label: 'Terça', value: 2 },
-        { label: 'Quarta', value: 3 },
-        { label: 'Quinta', value: 4 },
-        { label: 'Sexta', value: 5 }
+        { label: 'Segunda', value: 'Seg' },
+        { label: 'Terça', value: 'Ter' },
+        { label: 'Quarta', value: 'Qua' },
+        { label: 'Quinta', value: 'Qui' },
+        { label: 'Sexta', value: 'Sex' }
       ],
       info: {
         max_price: '',
@@ -392,7 +422,8 @@ export default {
     apiClient.get(url, data).then(response => {
       Object.keys(response.data).forEach((key) => {
         var category = response.data[key].category.toUpperCase()
-        var product = category + ' | ' + response.data[key].product.toUpperCase()
+        var id = response.data[key].id
+        var product = id + ' | ' + category + ' | ' + response.data[key].product.toUpperCase()
 
         self.productListOptions.push({
           value: key,
@@ -436,10 +467,17 @@ export default {
       })
     },
     addProduct () {
-      var e = this.$refs.cPrice.validate()
+      const e = this.$refs.cPrice.validate()
+      const u = this.$refs.unity.validate()
+
       if (e === false) {
         return false
       }
+
+      if (u === false) {
+        return false
+      }
+
       var interval = ''
       var eDay = ''
       if (this.recurrenceInterval === '' && this.recurrenceExactDay.length === 0) {
@@ -459,7 +497,7 @@ export default {
 
       const pSelected = {
         id: this.products[this.product].id,
-        product: this.productList[this.product].label,
+        product: this.productListOptions[this.product].label,
         price: this.costumerPrice,
         interval: interval,
         exactDay: eDay,
@@ -468,8 +506,8 @@ export default {
       }
       this.data.push(pSelected)
       this.clearFields()
-      this.productList[this.product].disable = true
-      this.product = ''
+      this.productListOptions[this.product].disable = true
+      this.product = null
     },
     edit () {
       const p = this.editProducts
@@ -491,14 +529,13 @@ export default {
           }
         })
       })
-
       this.$forceUpdate()
     },
     deleteProduct (o) {
       const p = this.data
       Object.keys(p).forEach((k) => {
         if (p[k].id === o.id) {
-          this.productList[parseInt(o.index)].disable = false
+          this.productListOptions[parseInt(o.index)].disable = false
           p.splice(k, 1)
         }
       })

@@ -728,7 +728,6 @@ export default {
     }
   },
   mounted () {
-    console.log(this.costumer)
     const id = this.costumer.c_id.split('_')
     const c = this.costumer
     this.company = id[0]

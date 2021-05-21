@@ -63,13 +63,18 @@
               </div>
               <!-- main activity -->
               <div class="row fit justify-center items-center content-start q-mt-lg">
-                <q-input
-                  style="width: 100%;"
-                  v-model="form.main_activity"
-                  class="text-uppercase"
+                <q-select
                   outlined
-                  dark
+                  v-model="form.main_activity"
+                  :options="activitiesList"
+                  style="width: 100%;"
                   label="Atividade Principal"
+                  dark
+                  use-chips
+                  use-input
+                  new-value-mode="add-unique"
+                  input-debounce="0"
+                  @filter="activitySelection"
                   :rules="[val => !!val || 'Campo obrigatório.']"
                 />
               </div>
@@ -95,24 +100,31 @@
                     </div>
                     <div class="col-6">
                       <q-field
-                        ref="nf"
-                        bottom-slots
-                        :value="form.nf"
-                        :rules="[val => !!val]"
-                        style="font-size: 16px"
+                        outlined
+                        dark
+                        class="row q-ml-md"
+                        style="background-color: #1d1d1d"
                       >
                         <template v-slot:control>
-                          <q-toggle
-                            ref="nf"
-                            v-model="form.nf"
-                            color="teal"
-                            indeterminate-value="false"
-                            false-value="false"
-                            true-value="true"
-                            size="lg"
-                            checked-icon="check"
-                            unchecked-icon="clear"
-                          />
+                          <div class="col-6 self-center q-pb-sm">
+                            <div
+                              class="text q-mt-sm q-ml-md text-uppercase text-caption"
+                              style="font-weight: 300; font-size: 1.1rem"
+                            >Nota Fiscal:</div>
+                          </div>
+                          <div class="col-6">Não
+                            <q-toggle
+                              ref="nf"
+                              v-model="form.nf"
+                              color="teal"
+                              indeterminate-value="false"
+                              size="lg"
+                              checked-icon="check"
+                              label="Sim"
+                              unchecked-icon="clear"
+                              class="q-ml-2"
+                            />
+                          </div>
                         </template>
                         <template v-slot:error>
                           Campo obrigatório.
@@ -182,8 +194,10 @@
                       outlined
                       v-model="form.parent_id"
                       :options="parentList"
+                      use-input
                       emit-value
                       map-options
+                      @filter="parentSelection"
                       style="width:100%"
                     />
                   </div>
@@ -367,7 +381,7 @@ export default {
         nf: '',
         company_type: '',
         contact: '',
-        main_activity: '',
+        main_activity: null,
         register_situation: '',
         phone: []
       },
@@ -385,7 +399,11 @@ export default {
       sendRequest: [],
       parentList: [],
       submitting: false,
-      company: ''
+      company: '',
+      subflag: 0,
+      activitiesList: [],
+      activitiesListOptions: [],
+      parentListOptions: []
     }
   },
   methods: {
@@ -408,6 +426,7 @@ export default {
     },
     beforeSubmit () {
       this.submitting = true
+      this.subflag = 0
       if (this.form.nf === '') {
         const el = this.$refs.nf.$el
         this.scrollToElement(el)
@@ -416,6 +435,8 @@ export default {
           icon: 'warning',
           color: 'red-7'
         })
+        this.submitting = false
+        return false
       }
 
       // company_type validation
@@ -427,18 +448,19 @@ export default {
           icon: 'warning',
           color: 'red-7'
         })
+        this.submitting = false
+        return false
       }
       this.msg++
       this.pmsg++
       this.pamsg++
       this.getPhones++
-      const self = this
-      setTimeout(function () {
-        self.submit()
-      }, 800)
+      // const self = this
+      // setTimeout(function () {
+      //   self.submit()
+      // }, 800)
     },
     submit () {
-      this.$emit('customerCreated', 'edit')
       const url = '/costumer/le/create'
       const data = {
         params: {
@@ -471,9 +493,7 @@ export default {
             message: 'Cliente não cadastrado, verifique os dados!',
             position: 'top-right'
           })
-          this.redirect()
         }
-        // console.log(response.data)
       }).catch(error => {
         if (error.response) {
           /*
@@ -517,7 +537,10 @@ export default {
           icon: 'warning',
           color: 'red-7'
         })
+        this.submitting = false
         return false
+      } else {
+        this.subflag++
       }
     },
     paymentMethod (data) {
@@ -529,6 +552,7 @@ export default {
           icon: 'warning',
           color: 'red-7'
         })
+        this.submitting = false
         return false
       } else if (data.term === '') {
         this.$q.notify({
@@ -536,9 +560,11 @@ export default {
           icon: 'warning',
           color: 'red-7'
         })
+        this.submitting = false
         return false
+      } else {
+        this.subflag++
       }
-
       this.payment = data
     },
     scrollToElement (el) {
@@ -552,6 +578,32 @@ export default {
       if (e.length === 2) {
         done(val)
       }
+    },
+    activitySelection (val, update) {
+      if (val === '') {
+        update(() => {
+          this.activitiesList = this.activitiesListOptions
+        })
+        return
+      }
+
+      update(() => {
+        const needle = val.toLowerCase()
+        this.activitiesList = this.activitiesListOptions.filter(v => v.toLowerCase().indexOf(needle) > -1)
+      })
+    },
+    parentSelection (val, update) {
+      if (val === '') {
+        update(() => {
+          this.parentList = this.parentListOptions
+        })
+        return
+      }
+
+      update(() => {
+        const needle = val.toLowerCase()
+        this.parentList = this.parentListOptions.filter(v => v.label.toLowerCase().indexOf(needle) > -1)
+      })
     }
   },
   mounted () {
@@ -565,11 +617,14 @@ export default {
       }
     }
     apiClient.get(url, data).then(response => {
-      Object.keys(response.data).forEach((key) => {
-        var id = response.data[key].id
-        var company = response.data[key].company_name.toUpperCase()
+      const le = response.data[0]
+      this.activitiesListOptions = response.data[1]
 
-        self.parentList.push({
+      Object.keys(le).forEach((key) => {
+        const id = le[key].id
+        const company = le[key].company_name.toUpperCase()
+
+        self.parentListOptions.push({
           value: id,
           label: company
         })
@@ -577,6 +632,15 @@ export default {
     }).catch(error => {
       console.log('error', error)
     })
+  },
+  watch: {
+    subflag: function (val) {
+      if (val === 2) {
+        this.submit()
+      } else {
+        this.submitting = false
+      }
+    }
   }
 }
 </script>

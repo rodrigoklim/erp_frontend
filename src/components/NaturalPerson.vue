@@ -68,12 +68,22 @@
                 />
               </div>
               <!-- fiscal state | Register Situation -->
-              <div class="row fit justify-start items-center content-start q-mt-lg">
+              <div class="row fit justify-center items-center content-start q-mt-lg">
+                <div class="col-6">
+                  <q-input
+                    style="width: 100%;"
+                    v-model="form.register_situation"
+                    outlined
+                    readonly
+                    dark
+                    label="Situação Cadastral"
+                  />
+                </div>
                 <div class="col-6">
                   <q-field
                     outlined
                     dark
-                    class="row"
+                    class="row q-ml-md"
                     style="background-color: #1d1d1d"
                   >
                     <template v-slot:control>
@@ -288,11 +298,25 @@ export default {
   },
   methods: {
     personData (data) {
-      console.log(data)
       this.form.cpf = data.cpf
       this.form.birthdate = data.data_nascimento
       this.form.name = data.nome.toUpperCase()
       this.form.register_situation = data.situacao_cadastral.toUpperCase()
+      if (this.form.register_situation === 'TITULAR FALECIDO') {
+        this.invalidCPF()
+      }
+    },
+    invalidCPF () {
+      this.$q.notify({
+        color: 'red-6',
+        icon: 'warning',
+        message: 'Dados Inválidos, Titular Falecido!',
+        position: 'top-right'
+      })
+      this.redirect()
+    },
+    redirect () {
+      this.$emit('customerCreated', 'edit')
     },
     numbers (data) {
       this.form.phones = data
@@ -374,28 +398,22 @@ export default {
       apiClient.post(url, data, config).then(response => {
         if (response.data === 'ok') {
           this.submitting = false
-          this.$router.push('/', () => {
-            this.$q.notify({
-              color: 'teal',
-              icon: 'check',
-              message: 'Cliente Cadastrado com sucesso!',
-              position: 'top-right'
-            })
+          this.$q.notify({
+            color: 'teal',
+            icon: 'check',
+            message: 'Cliente Cadastrado com sucesso!',
+            position: 'top-right'
           })
-          console.log('response', response.data)
+          this.redirect()
         } else {
           this.submitting = false
-          console.log('response', response.data)
-          this.$router.push('/clientes', () => {
-            this.$q.notify({
-              color: 'tomato',
-              icon: 'warning',
-              message: 'Cliente não cadastrado, verifique os dados!',
-              position: 'top-right'
-            })
+          this.$q.notify({
+            color: 'tomato',
+            icon: 'warning',
+            message: 'Cliente não cadastrado, verifique os dados!',
+            position: 'top-right'
           })
         }
-        console.log(response.data)
       }).catch(error => {
         if (error.response) {
           /*
@@ -427,7 +445,7 @@ export default {
       })
     }
   },
-  mounted () {
+  created () {
     this.company = 'np'
   }
 }
