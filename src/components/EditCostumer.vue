@@ -70,7 +70,6 @@
                   name="submitEdit"
                   icon="done_outline"
                   label="Gravar"
-                  @click="getData"
                 />
               </q-tabs>
             </template>
@@ -270,7 +269,7 @@
                             color="primary"
                             push
                             label="Salvar Alterações"
-                            @click="saveRegister"
+                            @click="getPhones++"
                           />
                         </div>
                       </div>
@@ -588,6 +587,7 @@ export default {
         products: []
 
       },
+      phoneNumbers: [],
       phones: [],
       editProducts: [],
       edited: false,
@@ -623,9 +623,6 @@ export default {
       this.addressList.push(this.newAddressSubmit[0][0])
       this.newAddress = false
     },
-    getData () {
-      console.log(this.submitData)
-    },
     productPicked (data) {
       this.costumer.products = ''
       this.costumer.products = data
@@ -634,16 +631,12 @@ export default {
       this.editProducts = data
       this.edited = true
     },
-    numbers (data) {
-      this.form.phones = data
+    numbers (phoneNumbers) {
+      this.form.phones = phoneNumbers
+      this.saveRegister()
     },
     saveRegister () {
-      const self = this
-      this.getPhones++
-      setTimeout(function () {
-        self.submitData.form = self.form
-        console.log(self.submitData)
-      }, 800)
+      this.submitData.form = this.form
       this.editedRegister = true
     },
     paymentMethod (data) {
@@ -651,6 +644,7 @@ export default {
       this.costumer.payment = data
       this.submitData.payment = data
       this.editedPay = true
+      console.log(this.submitData)
     },
     submit () {
       this.submitting = true
@@ -677,7 +671,6 @@ export default {
               position: 'top-right'
             })
           })
-          console.log('response', response.data)
         } else {
           this.submitting = false
           console.log('response', response.data)
@@ -690,7 +683,6 @@ export default {
             })
           })
         }
-        console.log(response.data)
       }).catch(error => {
         if (error.response) {
           /*

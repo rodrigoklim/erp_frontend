@@ -74,7 +74,10 @@
                           </q-input>
                         </template>
                         <template v-slot:body="props">
-                          <q-tr :props="props">
+                          <q-tr
+                            :props="props"
+                            @click="props.expand=!props.expand"
+                          >
                             <q-td>
                               <q-btn
                                 size="sm"
@@ -103,23 +106,6 @@
                               style="cursor:pointer"
                             >
                               {{ props.row.contact }}
-                              <q-popup-edit
-                                v-model="props.row.contact"
-                                title="Editar Contato"
-                                buttons
-                                persistent
-                                @save="editCustomer(props.row)"
-                                content-style="color:white; background-color:#1d1d1d"
-                              >
-                                <q-input
-                                  type="text"
-                                  v-model="props.row.nickname"
-                                  dense
-                                  autofocus
-                                  dark
-                                  class="text-uppercase"
-                                />
-                              </q-popup-edit>
                             </q-td>
                             <q-td
                               key="zone"
@@ -127,27 +113,6 @@
                               style="cursor:pointer"
                             >
                               {{ (props.row.zone) }}
-                              <q-popup-edit
-                                v-model="props.row.zone"
-                                title="Editar Região"
-                                buttons
-                                persistent
-                                @save="editCustomer(props.row)"
-                                content-style="color:white; background-color:#1d1d1d"
-                              >
-                                <!-- colocar um select com opções do IBGE para região -->
-                                <q-select
-                                  type="text"
-                                  mask="#.## Km/L"
-                                  unmasked-value
-                                  fill-mask="0"
-                                  reverse-fill-mask
-                                  v-model="props.row.zone"
-                                  dense
-                                  autofocus
-                                  dark
-                                />
-                              </q-popup-edit>
                             </q-td>
                             <q-td
                               key="phone_1"
@@ -155,25 +120,6 @@
                               style="cursor: pointer"
                             >
                               {{ props.row.phone_1.length === 11 ? props.row.phone_1.replace(/(\d{2})(\d{5})(\d{4})/, '($1)$2-$3') :  props.row.phone_1.replace(/(\d{2})(\d{4})(\d{4})/, '($1)$2-$3')  }}
-                              <q-popup-edit
-                                v-model="props.row.phone_1"
-                                title="Editar Valor"
-                                buttons
-                                persistent
-                                @save="editCustomer(props.row)"
-                                content-style="color:white; background-color:#1d1d1d"
-                              >
-                                <q-input
-                                  type="text"
-                                  unmasked-value
-                                  fill-mask="0"
-                                  reverse-fill-mask
-                                  v-model="props.row.phone_1"
-                                  dense
-                                  autofocus
-                                  dark
-                                />
-                              </q-popup-edit>
                             </q-td>
                           </q-tr>
                           <q-tr

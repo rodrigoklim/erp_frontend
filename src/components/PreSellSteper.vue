@@ -395,10 +395,10 @@ export default {
       )
     },
     selectCostumer (evt, row) {
-      if (row.register[0].account.financial_flag !== '1') {
+      if (row.account.financial_flag !== '1') {
         this.controlCostumer = true
-        this.costumer = row.register[0]
-        this.editProducts = row.register[0].products
+        this.costumer = row
+        this.editProducts = row.products
 
         if (this.costumer.account.nf === '1') {
           this.nf = true
@@ -407,7 +407,7 @@ export default {
         }
 
         this.address = []
-        row.register[0].address.forEach(this.addressPopulator)
+        row.address.forEach(this.addressPopulator)
 
         //   row.register[0].address :label="location.city +' - ' + location.street"
         //                   :val="location.id"

@@ -513,6 +513,7 @@ export default {
       const p = this.editProducts
       const self = this
       const pList = this.products
+      this.data = []
       Object.keys(p).forEach((k) => {
         Object.keys(pList).forEach((key) => {
           if (parseInt(pList[key].id) === parseInt(p[k].products_id)) {
