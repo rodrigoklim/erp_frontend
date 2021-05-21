@@ -91,47 +91,37 @@
                   />
                 </div>
                 <div class="col-6">
-                  <div class="row">
-                    <div class="col-6">
-                      <div
-                        class="text q-mt-sm q-ml-md"
-                        style="font-weight: 300; font-size: 1.1rem"
-                      >Nota Fiscal:</div>
-                    </div>
-                    <div class="col-6">
-                      <q-field
-                        outlined
-                        dark
-                        class="row q-ml-md"
-                        style="background-color: #1d1d1d"
-                      >
-                        <template v-slot:control>
-                          <div class="col-6 self-center q-pb-sm">
-                            <div
-                              class="text q-mt-sm q-ml-md text-uppercase text-caption"
-                              style="font-weight: 300; font-size: 1.1rem"
-                            >Nota Fiscal:</div>
-                          </div>
-                          <div class="col-6">Não
-                            <q-toggle
-                              ref="nf"
-                              v-model="form.nf"
-                              color="teal"
-                              indeterminate-value="false"
-                              size="lg"
-                              checked-icon="check"
-                              label="Sim"
-                              unchecked-icon="clear"
-                              class="q-ml-2"
-                            />
-                          </div>
-                        </template>
-                        <template v-slot:error>
-                          Campo obrigatório.
-                        </template>
-                      </q-field>
-                    </div>
-                  </div>
+                  <q-field
+                    outlined
+                    dark
+                    class="row q-ml-md"
+                    style="background-color: #1d1d1d; width: 100%"
+                  >
+                    <template v-slot:control>
+                      <div class="col-6 self-center q-pb-sm">
+                        <div
+                          class="text q-mt-sm q-ml-md text-uppercase text-caption"
+                          style="font-weight: 300; font-size: 1.1rem"
+                        >Nota Fiscal:</div>
+                      </div>
+                      <div class="col-6">Não
+                        <q-toggle
+                          ref="nf"
+                          v-model="form.nf"
+                          color="teal"
+                          indeterminate-value="false"
+                          size="lg"
+                          checked-icon="check"
+                          label="Sim"
+                          unchecked-icon="clear"
+                          class="q-ml-2"
+                        />
+                      </div>
+                    </template>
+                    <template v-slot:error>
+                      Campo obrigatório.
+                    </template>
+                  </q-field>
                 </div>
               </div>
               <!-- Heaquerters or Subsidiary | Zone -->
