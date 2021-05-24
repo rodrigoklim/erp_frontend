@@ -355,25 +355,23 @@
                       autocomplete="off"
                       @submit.prevent.stop="beforeSubmitAddress"
                       greedy
+                      style="width: 100%"
                     >
-                      <div class="col">
-                        <div class="row justify-center">
-                          <div class="col">
-                            <delivery-address
-                              :company="company"
-                              :submitAddress="msg"
-                              @addressFilled="addressFilled"
-                            />
-                          </div>
-                        </div>
-                        <div class="row justify-center">
-                          <q-btn
-                            color="primary"
-                            push
-                            label="Cadastrar Novo Endereço"
-                            type="submit"
-                          />
-                        </div>
+                      <div class="row justify-center">
+                        <delivery-address
+                          :company="company"
+                          :submitAddress="msg"
+                          @addressFilled="addressFilled"
+                          style="width: 100%"
+                        />
+                      </div>
+                      <div class="row justify-center">
+                        <q-btn
+                          color="primary"
+                          push
+                          label="Cadastrar Novo Endereço"
+                          type="submit"
+                        />
                       </div>
                     </q-form>
                   </div>
@@ -419,13 +417,7 @@
                       style="color: teal"
                     >
                       Método de Pagamento alterado com sucesso!!
-                      <div
-                        class="text-caption"
-                        style="color: #FFBF00"
-                      >
-                        Para entrar em rigor as alterações necessitam de aprovação do depto financeiro.
-                      </div>
-                      <br><br>
+
                       <div
                         class="text-caption"
                         style="color: #FFBF00"
@@ -608,6 +600,10 @@ export default {
     },
     deleteAddress (i) {
       this.addressList.splice(i, 1)
+      this.submitData.address = this.addressList
+      if (this.addressList.length === 0) {
+        this.submitData.address = null
+      }
     },
     beforeSubmitAddress () {
       this.msg++
@@ -620,13 +616,15 @@ export default {
       this.newAddressSubmit = [data]
     },
     submitAddress () {
+      const a = this.newAddressSubmit[0][0]
+      console.log(a)
+      this.newAddressSubmit[0][0].full_address = a.street + ', ' + a.number + ', ' + a.complement + ', ' + a.district + ' - ' + 'CEP: ' + a.zipCode + '. ' + a.city + ' - ' + a.state + '.'
       this.addressList.push(this.newAddressSubmit[0][0])
       this.newAddress = false
     },
     productPicked (data) {
       this.costumer.products = ''
       this.costumer.products = data
-      console.log(this.costumer.products = data)
       this.submitData.products = data
       this.editProducts = data
       this.edited = true
@@ -722,7 +720,7 @@ export default {
   mounted () {
     const id = this.costumer.c_id.split('_')
     const c = this.costumer
-    this.company = id[0]
+    this.company = 'np'
     this.form.company_name = c.company_name
     this.editPayment = c.pay_method
     this.editProducts = c.products

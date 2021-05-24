@@ -1,3 +1,4 @@
+/* eslint-disable vue/no-unused-vars */
 <template>
   <div class="route">
     <q-page class="flex">
@@ -28,6 +29,8 @@
                   ref="calendar"
                   v-model="selectedDate"
                   view="week-agenda"
+                  :column-header-before="true"
+                  :column-header-after="true"
                   dark
                   locale="pt-br"
                   no-scroll
@@ -38,6 +41,12 @@
                   class="q-pa-sm"
                   style="min-height: 550px;"
                 >
+
+                  <template #day-header="{ timestamp }">
+                    <div class="row justify-center">
+                      {{ timestamp.month}}
+                    </div>
+                  </template>
                   <template #day-body="{ timestamp }">
                     <template
                       v-for="(agenda) in getAgenda(timestamp.date)"
@@ -52,6 +61,7 @@
                         <q-card
                           :class="event.color"
                           :key="index"
+                          style="width: 100%"
                         >
                           <!-- presell element -->
                           <div
@@ -67,9 +77,10 @@
                             </div>
                             <div
                               class="col-8 q-ml-md q-mt-none items-start"
-                              style="font-size:14px"
+                              style="font-size:14px;font-weight:bolder;  min-width: 0; white-space: nowrap; overflow: hidden;text-overflow: ellipsis;"
+                              ellipsis
                             >
-                              <strong>{{ event.label }}</strong>
+                              {{ event.label }}
                               <div class="row">
                                 <div class="text-muted q-ma-none q-pa-none "><small>{{event.zone}}</small></div>
                               </div>
@@ -103,8 +114,8 @@
                               </div>
                             </div>
                             <div
-                              v-for="costumer, index in event.routeOrder"
-                              :key="index"
+                              v-for="costumer in event.routeOrder"
+                              :key="costumer.label"
                             >
                               <div class="row">
                                 <div

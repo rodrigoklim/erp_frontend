@@ -77,6 +77,7 @@
                           <q-tr
                             :props="props"
                             @click="props.expand=!props.expand"
+                            style="cursor:pointer"
                           >
                             <q-td>
                               <q-btn
@@ -84,7 +85,6 @@
                                 color="primary"
                                 round
                                 dense
-                                @click="props.expand = !props.expand"
                                 :icon="props.expand ? 'remove' : 'add'"
                               />
                             </q-td>

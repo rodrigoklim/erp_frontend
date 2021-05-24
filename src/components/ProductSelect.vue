@@ -468,7 +468,10 @@ export default {
     },
     addProduct () {
       const e = this.$refs.cPrice.validate()
-      const u = this.$refs.unity.validate()
+      let u = true
+      if (this.$refs.unity) {
+        u = this.$refs.unity.validate()
+      }
 
       if (e === false) {
         return false
@@ -524,7 +527,8 @@ export default {
               price: 'R$ ' + price.toFixed(2),
               interval: p[k].interval,
               exactDay: p[k].exact_day,
-              unity: p[k].unity
+              unity: p[k].unity,
+              index: key
             })
             this.productListOptions[key].disable = true
           }
