@@ -556,6 +556,7 @@ export default {
       this.info.unity = ''
       this.info.max_price = ''
       this.priceTag = false
+      this.cUnity = false
     },
     getObjects (obj, key, val) {
       var objects = []

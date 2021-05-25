@@ -394,7 +394,7 @@ export default {
       this.zipErrorMessage = 'O CEP deve conter 8 números!'
       if (zip.length === 8) {
         this.zipError = false
-        this.$axios.get('http://www.viacep.com.br/ws/' + zip + '/json').then(response => {
+        this.$axios.get('https://viacep.com.br/ws/' + zip + '/json').then(response => {
           this.city_search[i] = response.data.ibge
           this.state_search[i] = response.data.uf
 

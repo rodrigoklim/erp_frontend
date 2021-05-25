@@ -617,7 +617,9 @@ export default {
     },
     submitAddress () {
       const a = this.newAddressSubmit[0][0]
-      console.log(a)
+      if (!a.complement) {
+        a.complement = ''
+      }
       this.newAddressSubmit[0][0].full_address = a.street + ', ' + a.number + ', ' + a.complement + ', ' + a.district + ' - ' + 'CEP: ' + a.zipCode + '. ' + a.city + ' - ' + a.state + '.'
       this.addressList.push(this.newAddressSubmit[0][0])
       this.newAddress = false
@@ -646,6 +648,7 @@ export default {
     },
     submit () {
       this.submitting = true
+      this.submitData.address = this.addressList
       const url = '/costumer/edit'
       const data = {
         params: {
