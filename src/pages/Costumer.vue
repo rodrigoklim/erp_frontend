@@ -96,12 +96,24 @@
                               {{ props.row.c_id}}
                             </q-td>
                             <q-td
+                              v-if=" props.row.corporate_name"
                               key="corporate_name"
                               :props="props"
                             >
                               <span class="text-overflow-dynamic-container">
                                 <span class="text-overflow-dynamic-ellipsis">
                                   {{ props.row.corporate_name}}
+                                </span>
+                              </span>
+                            </q-td>
+                            <q-td
+                              v-else
+                              key="corporate_name"
+                              :props="props"
+                            >
+                              <span class="text-overflow-dynamic-container">
+                                <span class="text-overflow-dynamic-ellipsis">
+                                  {{ props.row.name}}
                                 </span>
                               </span>
                             </q-td>
@@ -113,6 +125,7 @@
                               {{ props.row.company_name }}
                             </q-td>
                             <q-td
+                              v-if="props.row.company_type"
                               key="company_type"
                               :props="props"
                               style="max-width: 200px"
@@ -120,11 +133,30 @@
                               {{ props.row.company_type }}
                             </q-td>
                             <q-td
+                              v-else
+                              key="company_type"
+                              :props="props"
+                              style="max-width: 200px"
+                              class="text-center"
+                            >
+                              -
+                            </q-td>
+                            <q-td
+                              v-if="props.row.contact"
                               key="contact"
                               :props="props"
                               style="cursor:pointer"
                             >
                               {{ props.row.contact }}
+                            </q-td>
+                            <q-td
+                              v-else
+                              key="contact"
+                              :props="props"
+                              style="max-width: 200px"
+                              class="text-center"
+                            >
+                              -
                             </q-td>
                             <q-td
                               key="zone"
