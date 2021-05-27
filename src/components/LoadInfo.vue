@@ -96,7 +96,7 @@
                       </div>
                     </div>
                     <div class="col-2">
-                      <q-checkbox v-model="form.bot_crio.use"/>
+                      <q-checkbox v-model="form.bot_crio.use" />
                     </div>
                   </div>
                   <div
@@ -131,7 +131,7 @@
                       </div>
                     </div>
                     <div class="col-2">
-                      <q-checkbox v-model="form.cylinder.use"/>
+                      <q-checkbox v-model="form.cylinder.use" />
                     </div>
                   </div>
                   <div
@@ -166,7 +166,7 @@
                       </div>
                     </div>
                     <div class="col-2">
-                      <q-checkbox v-model="form.caps.use"/>
+                      <q-checkbox v-model="form.caps.use" />
                     </div>
                   </div>
                   <div
@@ -201,7 +201,7 @@
                       </div>
                     </div>
                     <div class="col-2">
-                      <q-checkbox v-model="form.helmet.use"/>
+                      <q-checkbox v-model="form.helmet.use" />
                     </div>
                   </div>
                   <div
@@ -242,7 +242,7 @@
                       </div>
                     </div>
                     <div class="col-2">
-                      <q-checkbox v-model="form.funnel.use"/>
+                      <q-checkbox v-model="form.funnel.use" />
                     </div>
                   </div>
                   <div
@@ -277,7 +277,7 @@
                       </div>
                     </div>
                     <div class="col-2">
-                      <q-checkbox v-model="form.scale.use"/>
+                      <q-checkbox v-model="form.scale.use" />
                     </div>
                   </div>
                   <div
@@ -312,7 +312,7 @@
                       </div>
                     </div>
                     <div class="col-2">
-                      <q-checkbox v-model="form.dolly.use"/>
+                      <q-checkbox v-model="form.dolly.use" />
                     </div>
                   </div>
                   <div
@@ -371,9 +371,7 @@
                       </div>
                     </div>
                   </div>
-                  <div
-                    class="row"
-                  >
+                  <div class="row">
                     <q-input
                       dark
                       outlined
@@ -520,7 +518,6 @@ export default {
   },
   methods: {
     submitForm () {
-      console.log('oi')
       const url = '/route/checklist/load/save'
       const config = {
         headers: {

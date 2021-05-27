@@ -611,7 +611,7 @@ export default {
       this.activitiesListOptions = response.data[1]
 
       Object.keys(le).forEach((key) => {
-        const id = le[key].id
+        const id = le[key].c_id
         const company = le[key].company_name.toUpperCase()
 
         self.parentListOptions.push({
@@ -625,7 +625,9 @@ export default {
   },
   watch: {
     subflag: function (val) {
-      if (val === 2) {
+      if (this.form.company_type === 'filial' && val === 1) {
+        this.submit()
+      } else if (val === 2) {
         this.submit()
       } else {
         this.submitting = false

@@ -119,6 +119,7 @@
                                             :key="i"
                                             :label="product.product"
                                             v-model="product.qty"
+                                            :value="product.qty"
                                             class="q-pb-sm"
                                             @input="sumQty(product)"
                                           />
@@ -218,8 +219,14 @@
                                   :lat-lng="marker.value"
                                   v-for="marker, index in markers"
                                   :key="index"
-                                  :icon="marker.icon"
                                 >
+                                  <l-popup>{{marker.text}}</l-popup>
+                                  <l-icon
+                                    :icon-size="dynamicSize"
+                                    :icon-anchor="dynamicAnchor"
+                                    :icon-url="marker.icon"
+                                  >
+                                  </l-icon>
                                 </l-marker>
                                 <l-polyline
                                   v-for="polyline in route"
@@ -384,7 +391,7 @@
 
 <script>
 import { latLng, Icon } from 'leaflet'
-import { LMap, LTileLayer, LMarker, LPolyline } from 'vue2-leaflet'
+import { LMap, LTileLayer, LMarker, LPolyline, LPopup, LIcon } from 'vue2-leaflet'
 import { VueSvgGauge } from 'vue-svg-gauge'
 import apiClient from 'src/services/api'
 import draggable from 'vuedraggable'
@@ -403,6 +410,8 @@ export default {
     LTileLayer,
     LMarker,
     LPolyline,
+    LPopup,
+    LIcon,
     VueSvgGauge,
     draggable
   },
@@ -497,9 +506,15 @@ export default {
     estimatedDelivery (i) {
       return this.details.matrix[i].time
     },
-    handleMarkers (data) {
+    handleMarkers (data, popup) {
+      let icon = ''
+      if (popup === 'PONTO FINAL') {
+        icon = require('../assets/img/miniatura_novo.png')
+      }
       this.markers.push({
-        value: latLng(data.pointB.split(',').reverse())
+        value: latLng(data.pointB.split(',').reverse()),
+        text: popup,
+        icon: icon
       })
       const map = this.$refs.map.mapObject
       // const markers = this.$refs.markers
@@ -508,15 +523,17 @@ export default {
     },
     handlePolyline (data) {
       const self = this
+      const icon = require('../assets/img/miniatura_novo.png')
       const path = []
       this.route = []
       this.markers = []
-      console.log(data.matrix[0])
       this.markers.push({
-        value: latLng(data.matrix[0].markers.pointA.split(',').reverse())
+        value: latLng(data.matrix[0].markers.pointA.split(',').reverse()),
+        text: 'PARTIDA',
+        icon: icon
       })
       data.matrix.forEach(function (item) {
-        self.handleMarkers(item.markers)
+        self.handleMarkers(item.markers, item.nickname)
         item.route.forEach(function (coords) {
           path.push([coords[1], coords[0]])
         })
@@ -543,6 +560,7 @@ export default {
       apiClient.post(url, data, config).then(response => {
         console.log(response.data)
         this.details = response.data.details
+        this.vehicleDetails(this.selectedVehicle)
         this.handlePolyline(this.details)
       }).catch(error => {
         if (error.response) {
@@ -565,7 +583,7 @@ export default {
     vehicleDetails (value) {
       this.fuel.min = 0
       this.fuel.max = parseFloat(value.vehicle.fuel_tank)
-      this.fuel.value = parseFloat(value.fuel.balance) - (parseFloat(this.details.totalLength) / parseFloat(value.vehicle.autonomy))
+      this.fuel.value = parseFloat(value.fuel.balance) - (parseFloat(this.details.totalLength) / (parseFloat(value.vehicle.autonomy) / 100))
       if (value.load === null) {
         this.load.min = 0
         this.load.value = 0
@@ -581,8 +599,15 @@ export default {
     handleZoneList (value) {
       const self = this
       value.forEach(function (item) {
-        console.log(item.address.zone)
-        self.zone.push(item.address.zone)
+        if (self.zone.length === 0) {
+          self.zone.push(item.address.zone)
+        } else {
+          self.zone.forEach(function (zoneItem) {
+            if (zoneItem !== item.address.zone) {
+              self.zone.push(item.address.zone)
+            }
+          })
+        }
       })
     },
     submitRoute () {
@@ -685,6 +710,14 @@ export default {
         console.log('Error', error.message)
       }
     })
+  },
+  computed: {
+    dynamicSize () {
+      return [this.iconSize, this.iconSize * 1.15]
+    },
+    dynamicAnchor () {
+      return [this.iconSize / 2, this.iconSize * 1.15]
+    }
   }
 }
 </script>

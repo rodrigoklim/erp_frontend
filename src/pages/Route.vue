@@ -29,8 +29,6 @@
                   ref="calendar"
                   v-model="selectedDate"
                   view="week-agenda"
-                  :column-header-before="true"
-                  :column-header-after="true"
                   dark
                   locale="pt-br"
                   no-scroll
@@ -41,10 +39,22 @@
                   class="q-pa-sm"
                   style="min-height: 550px;"
                 >
-
-                  <template #day-header="{ timestamp }">
-                    <div class="row justify-center">
-                      {{ timestamp.month}}
+                  <template #head-day="{ timestamp }">
+                    <div class="row justify-center q-pt-sm">
+                      {{ getWeekDay(timestamp.weekday)}}
+                    </div>
+                    <div
+                      class="row justify-center bg-primary items-center q-pt-sm q-pb-sm"
+                      v-if="today(timestamp)"
+                    >
+                      {{getMonth(timestamp)}}
+                    </div>
+                    <div
+                      class="row justify-center items-center q-pt-sm q-pb-sm"
+                      v-else
+                      height="100%"
+                    >
+                      {{getMonth(timestamp)}}
                     </div>
                   </template>
                   <template #day-body="{ timestamp }">
@@ -227,7 +237,13 @@
 </template>
 
 <script>
+/**
+ * melhorias:
+ * - fazer rotas ficar no topo sempre
+ * - mostrar/esconder recorrencia, prevenda e rota
+ */
 import apiClient from 'src/services/api'
+
 export default {
   name: 'Route',
   data () {
@@ -235,7 +251,8 @@ export default {
       selectedDate: '',
       val: [],
       agenda: {},
-      route: []
+      route: [],
+      value: []
     }
   },
   methods: {
@@ -266,6 +283,155 @@ export default {
     setRoute () {
       const value = this.route[0].route
       this.$router.push({ path: '/nova/rota/checklist/carga/' + value })
+    },
+    getWeekDay (val) {
+      switch (val) {
+        case 0:
+          return 'Dom'
+        case 1:
+          return 'Seg'
+        case 2:
+          return 'Ter'
+        case 3:
+          return 'Qua'
+        case 4:
+          return 'Qui'
+        case 5:
+          return 'Sex'
+        case 6:
+          return 'Sab'
+      }
+    },
+    getMonth (val) {
+      let month = ''
+
+      switch (val.month) {
+        case 1:
+          month = 'Jan'
+          break
+        case 2:
+          month = 'Fev'
+          break
+        case 3:
+          month = 'Mar'
+          break
+        case 4:
+          month = 'Abr'
+          break
+        case 5:
+          month = 'Mai'
+          break
+        case 6:
+          month = 'Jun'
+          break
+        case 7:
+          month = 'Jul'
+          break
+        case 8:
+          month = 'Ago'
+          break
+        case 9:
+          month = 'Set'
+          break
+        case 10:
+          month = 'Out'
+          break
+        case 11:
+          month = 'Nov'
+          break
+        case 12:
+          month = 'Dez'
+          break
+      }
+      return val.day + '/' + month
+    },
+    today (val) {
+      const now = new Date()
+      let month = ''
+      let nowMonth = ''
+
+      switch (val.month) {
+        case 1:
+          month = 'Jan'
+          break
+        case 2:
+          month = 'Fev'
+          break
+        case 3:
+          month = 'Mar'
+          break
+        case 4:
+          month = 'Abr'
+          break
+        case 5:
+          month = 'Mai'
+          break
+        case 6:
+          month = 'Jun'
+          break
+        case 7:
+          month = 'Jul'
+          break
+        case 8:
+          month = 'Ago'
+          break
+        case 9:
+          month = 'Set'
+          break
+        case 10:
+          month = 'Out'
+          break
+        case 11:
+          month = 'Nov'
+          break
+        case 12:
+          month = 'Dez'
+          break
+      }
+
+      switch (now.getMonth()) {
+        case 0:
+          nowMonth = 'Jan'
+          break
+        case 1:
+          nowMonth = 'Fev'
+          break
+        case 2:
+          nowMonth = 'Mar'
+          break
+        case 3:
+          nowMonth = 'Abr'
+          break
+        case 4:
+          nowMonth = 'Mai'
+          break
+        case 5:
+          nowMonth = 'Jun'
+          break
+        case 6:
+          nowMonth = 'Jul'
+          break
+        case 7:
+          nowMonth = 'Ago'
+          break
+        case 8:
+          nowMonth = 'Set'
+          break
+        case 9:
+          nowMonth = 'Out'
+          break
+        case 10:
+          nowMonth = 'Nov'
+          break
+        case 11:
+          nowMonth = 'Dez'
+          break
+      }
+      if (val.day === now.getDate() && month === nowMonth) {
+        return true
+      } else {
+        return false
+      }
     }
   },
   mounted () {

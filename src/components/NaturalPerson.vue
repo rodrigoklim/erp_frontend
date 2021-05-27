@@ -57,13 +57,18 @@
               </div>
               <!-- main activity -->
               <div class="row fit justify-center items-center content-start q-mt-lg">
-                <q-input
-                  style="width: 100%;"
-                  v-model="form.main_activity"
-                  class="text-uppercase"
+                <q-select
                   outlined
-                  dark
+                  v-model="form.main_activity"
+                  :options="activitiesList"
+                  style="width: 100%;"
                   label="Atividade Principal"
+                  dark
+                  use-chips
+                  use-input
+                  new-value-mode="add-unique"
+                  input-debounce="0"
+                  @filter="activitySelection"
                   :rules="[val => !!val || 'Campo obrigatório.']"
                 />
               </div>
@@ -253,7 +258,7 @@ import PaymentMethods from './PaymentMethods.vue'
 import Phone from './Phone.vue'
 import ProductSelect from './ProductSelect.vue'
 import SearchCpf from './SearchCpf.vue'
-import { scroll } from 'quasar'
+import { scroll, throttle } from 'quasar'
 import apiClient from 'src/services/api'
 
 const { getScrollTarget, setScrollPosition } = scroll
@@ -274,8 +279,9 @@ export default {
         name: '',
         birthdate: '',
         company_name: '',
-        main_activity: '',
+        main_activity: null,
         register_situation: '',
+        company_type: 'matriz',
         nf: '',
         email: null,
         phones: []
@@ -293,7 +299,9 @@ export default {
       sendRequest: [],
       parentList: [],
       submitting: false,
-      company: ''
+      company: '',
+      activitiesList: [],
+      activitiesListOptions: []
     }
   },
   methods: {
@@ -380,6 +388,19 @@ export default {
         self.submit()
       }, 800)
     },
+    activitySelection (val, update) {
+      if (val === '') {
+        update(() => {
+          this.activitiesList = this.activitiesListOptions
+        })
+        return
+      }
+
+      update(() => {
+        const needle = val.toLowerCase()
+        this.activitiesList = this.activitiesListOptions.filter(v => v.toLowerCase().indexOf(needle) > -1)
+      })
+    },
     submit () {
       const url = '/costumer/np/create'
       const data = {
@@ -444,6 +465,20 @@ export default {
         position: 'top-right'
       })
     }
+  },
+  mounted () {
+    this.submit = throttle(this.submit, 500)
+    const url = '/costumer/le/list'
+    const data = {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.token
+      }
+    }
+    apiClient.get(url, data).then(response => {
+      this.activitiesListOptions = response.data[1]
+    }).catch(error => {
+      console.log('error', error)
+    })
   },
   created () {
     this.company = 'np'

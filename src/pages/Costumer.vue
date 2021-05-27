@@ -89,16 +89,35 @@
                               />
                             </q-td>
                             <q-td
-                              key="register_number"
+                              key="c_id"
+                              :props="props"
+                              style="max-width: 30px"
+                            >
+                              {{ props.row.c_id}}
+                            </q-td>
+                            <q-td
+                              key="corporate_name"
                               :props="props"
                             >
-                              {{ props.row.register_number.indexOf('.') === -1 ?  props.row.register_number.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5') :  props.row.register_number}}
+                              <span class="text-overflow-dynamic-container">
+                                <span class="text-overflow-dynamic-ellipsis">
+                                  {{ props.row.corporate_name}}
+                                </span>
+                              </span>
                             </q-td>
                             <q-td
                               key="company_name"
                               :props="props"
+                              style="max-width: 200px"
                             >
                               {{ props.row.company_name }}
+                            </q-td>
+                            <q-td
+                              key="company_type"
+                              :props="props"
+                              style="max-width: 200px"
+                            >
+                              {{ props.row.company_type }}
                             </q-td>
                             <q-td
                               key="contact"
@@ -167,37 +186,38 @@
                                       dark
                                       style="cursor:default !important"
                                     />
-                                    <q-field
-                                      ref="nf"
-                                      dark
+                                    <q-input
+                                      v-if="props.row.company_type === 'matriz'"
                                       label="Nota Fiscal"
-                                      bottom-slots
-                                      :value="props.row.account.nf"
-                                      style="font-size: 16px"
-                                    >
-                                      <template v-slot:control>
-                                        <q-toggle
-                                          disable
-                                          dark
-                                          ref="nf"
-                                          v-model="props.row.account.nf"
-                                          color="teal"
-                                          false-value="0"
-                                          true-value="1"
-                                          size="lg"
-                                          checked-icon="check"
-                                          unchecked-icon="clear"
-                                          style="cursor:default !important"
-                                        />
-                                      </template>
-                                    </q-field>
+                                      :value="props.row.account.nf === 'true' || props.row.account.nf == 1? 'SIM' : 'NÃO'"
+                                      disable
+                                      dark
+                                      style="cursor:default !important"
+                                    />
+                                    <q-input
+                                      v-else
+                                      label="Nota Fiscal"
+                                      value="VERIFICAR OPÇÃO NA MATRIZ"
+                                      disable
+                                      dark
+                                      style="cursor:default !important"
+                                    />
                                   </div>
                                 </div>
                                 <div class="col-6">
                                   <div class="q-mx-md">
                                     <q-input
+                                      v-if="props.row.company_type === 'matriz'"
                                       label="Método de Pagamento"
                                       v-model="props.row.pay_method.payment_description"
+                                      disable
+                                      dark
+                                      style="cursor:default !important"
+                                    />
+                                    <q-input
+                                      v-else
+                                      label="Método de Pagamento"
+                                      value="VERIFICAR OPÇÃO NA MATRIZ"
                                       disable
                                       dark
                                       style="cursor:default !important"
@@ -284,8 +304,10 @@ export default {
     return {
       columns: [
         { name: '', align: 'start', label: '' },
-        { name: 'register_number', label: 'CNPJ / CPF', align: 'center', field: 'register_number' },
+        { name: 'c_id', align: 'start', label: '#', field: 'c_id' },
+        { name: 'corporate_name', label: 'Razáo Social', align: 'left', field: 'corporate_name' },
         { name: 'company_name', align: 'left', label: 'Nome Fantasia', field: 'company_name', sortable: true },
+        { name: 'company_type', align: 'left', label: 'Tipo', field: 'company_type', sortable: true },
         { name: 'contact', align: 'center', label: 'Contato', field: 'contact', sortable: true },
         { name: 'zone', align: 'center', label: 'Região', field: 'zone', sortable: true },
         { name: 'phone_1', align: 'center', label: 'Telefone', field: 'phone_1', sortable: true }
@@ -339,6 +361,7 @@ export default {
       }
       apiClient.get(url, params).then(response => {
         const data = response.data
+        console.log(response.data)
         let i
         for (i = 0; i < 2; i++) {
           data[i].forEach(function (c) {
@@ -397,4 +420,34 @@ export default {
 }
 </script>
 <style>
+.text-overflow-dynamic-container {
+  position: relative;
+  max-width: 100%;
+  padding: 0 !important;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: flex;
+  vertical-align: text-bottom !important;
+}
+.text-overflow-dynamic-ellipsis {
+  position: absolute;
+  white-space: nowrap;
+  overflow-y: visible;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  max-width: 100%;
+  min-width: 0;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+.text-overflow-dynamic-container:after,
+.text-overflow-dynamic-ellipsis:after {
+  content: "-";
+  display: inline;
+  visibility: hidden;
+  width: 0;
+}
 </style>
