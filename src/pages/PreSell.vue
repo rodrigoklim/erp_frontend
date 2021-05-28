@@ -27,7 +27,7 @@
                 <div class="row justify-center">
                   <div class="col-8 q-mr-md">
                     <q-card dark>
-                      <pre-sell-steper></pre-sell-steper>
+                      <pre-sell-steper @newPresell="submit"></pre-sell-steper>
                     </q-card>
                   </div>
                   <div class="col-3 q-ml-md">
@@ -42,7 +42,7 @@
                               dense
                               dark
                               v-model="presell.deliveryDate"
-                              label="Data da Entrega"
+                              label="Entrega"
                             />
                           </div>
                         </div>
@@ -155,6 +155,7 @@
 import PreSellSteper from 'src/components/PreSellSteper.vue'
 import EventBus from 'src/boot/EventBus'
 import apiClient from 'src/services/api'
+import { throttle } from 'quasar'
 
 export default {
   components: { PreSellSteper },
@@ -206,7 +207,8 @@ export default {
     updateObservation (data) {
       this.presell.observation = data
     },
-    submit () {
+    submit (payload) {
+      console.log(payload)
       const url = '/presell/create'
       const config = {
         headers: {
@@ -216,6 +218,7 @@ export default {
       const data = {
         params: this.presell
       }
+      console.log(data)
       apiClient.post(url, data, config).then(response => {
         console.log(response.data)
         if (response.data === 'ok') {
@@ -264,13 +267,14 @@ export default {
     EventBus.$on('presellObservation', (data) => {
       this.updateObservation(data)
     })
-    EventBus.$on('submit', (data) => {
-      if (this.control !== data) {
-        this.control++
-        this.submit()
-      }
-    })
+    // EventBus.$on('submit', (data) => {
+    //   console.log(data)
+    //   if (data === 0) {
+    //     this.submit()
+    //   }
+    // })
     localStorage.payCode = false
+    this.submit = throttle(this.submit, 500)
   },
   watch: {
     ongoing: function (newVal, oldVal) {

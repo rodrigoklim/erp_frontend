@@ -250,13 +250,14 @@ export default {
   },
   mounted () {
     const costumer = JSON.parse(localStorage.getItem('costumer'))
+    console.log(costumer)
     const c = costumer.observations
     this.c_id = costumer.c_id
     Object.keys(c).forEach((i) => {
       if (c[i].destination === 'INVOICE') {
         this.fiscalObs.push({
           label: c[i].title,
-          details: c[i].observation,
+          details: c[i].observation.toUpperCase(),
           c_id: c[i].c_id
         })
       } else {

@@ -523,7 +523,7 @@ export default {
             const price = (pList[key].max_price * p[k].price) / 100
             self.data.push({
               id: p[k].products_id,
-              product: pList[key].category.toUpperCase() + ' | ' + pList[key].product,
+              product: pList[key].category.toUpperCase() + ' | ' + pList[key].product.toUpperCase(),
               price: 'R$ ' + price.toFixed(2),
               interval: p[k].interval,
               exactDay: p[k].exact_day,

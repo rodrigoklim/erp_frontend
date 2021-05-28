@@ -95,11 +95,15 @@ export default {
   methods: {
     handleCPF () {
       const e = this.validateCPF(this.cpf)
+      console.log('e', e)
       this.loadingState = true
       this.$refs.cpf.validate()
       if (e === true) {
         this.$refs.cpf.validate()
-        this.uniqueSearch(this.cpf)
+        const u = this.uniqueSearch(this.cpf)
+        if (u === false) {
+          return false
+        }
       } else {
         this.error = 'CPF inserido inválido ou incorreto'
         this.loadingState = false
@@ -167,9 +171,10 @@ export default {
           Authorization: 'Bearer ' + localStorage.token
         },
         params: {
-          cpf: cpf
+          cpf: cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
         }
       }
+      console.log(data)
       apiClient.get(url, data).then(response => {
         if (response.data === 'error') {
           this.error = 'Este Cliente já está cadastrado'

@@ -41,12 +41,15 @@
           </template>
 
           <template v-slot:body-cell-flag="props">
-            <q-td :props="props">
+            <q-td
+              :props="props"
+              v-if="props.row.account.financial_flag && props.row.account.remittance_flag"
+            >
               <q-icon
                 v-if="props.row.account.financial_flag == 1"
                 name="fas fa-exclamation-circle"
                 color="red-6"
-                size="sm"
+                size="xs"
                 class="q-mr-sm"
               >
                 <q-tooltip
@@ -62,7 +65,7 @@
                 v-if="props.row.account.remittance_flag == 1"
                 name="fas fa-exclamation-triangle"
                 color="yellow-9"
-                size="sm"
+                size="xs"
               />
               <q-tooltip
                 content-class="bg-grey"
@@ -73,8 +76,42 @@
                 Alerta de Itens no Cliente
               </q-tooltip>
             </q-td>
+            <q-td
+              :props="props"
+              v-else
+            >
+              <q-icon
+                v-if="!props.row.account.financial_flag"
+                name="fas fa-check-circle"
+                color="teal"
+                size="xs"
+                class="q-mr-sm"
+              >
+                <q-tooltip
+                  content-class="bg-grey"
+                  :offset="[10, 10]"
+                  anchor="center left"
+                >
+                  Nada Consta
+                </q-tooltip>
+              </q-icon>
+              <q-icon
+                v-if="!props.row.account.remittance_flag"
+                name="fas fa-check-circle"
+                color="teal"
+                size="xs"
+                class="q-mr-sm"
+              />
+              <q-tooltip
+                content-class="bg-grey"
+                :delay="800"
+                anchor="center right"
+                :offset="[10, 10]"
+              >
+                Nada Consta
+              </q-tooltip>
+            </q-td>
           </template>
-
         </q-table>
       </q-step>
       <q-step
@@ -115,7 +152,7 @@
                     class="text-uppercase q-pa-md"
                     outlined
                     dark
-                    label="Data de Entrega"
+                    label="Entrega"
                     v-model="deliveryDate"
                     @input="selectedPeriod"
                     :rules="[val => !!val || 'Campo obrigatório.']"
@@ -287,6 +324,7 @@ import moment from 'moment'
 import PaymentMethods from './PaymentMethods.vue'
 import ProductSelect from './ProductSelect.vue'
 import OrderObservations from './OrderObservations.vue'
+import { throttle } from 'quasar'
 
 export default {
   components: { PaymentMethods, ProductSelect, OrderObservations },
@@ -339,14 +377,12 @@ export default {
     }
     apiClient.get(url, data).then(response => {
       self.costumers = response.data[0]
-      console.log(this.costumers)
       if (response.data[1]) {
         response.data[1].forEach(function (value) {
           console.log(value)
           self.costumers.push(value)
         })
       }
-      console.log(this.costumers)
       self.visible = false
     }).catch(error => {
       if (error.response) {
@@ -395,9 +431,10 @@ export default {
       )
     },
     selectCostumer (evt, row) {
-      if (row.account.financial_flag !== '1') {
+      if (row.account.financial_flag !== '1' || row.account.financial_flag) {
         this.controlCostumer = true
         this.costumer = row
+        localStorage.costumer = row
         this.editProducts = row.products
 
         if (this.costumer.account.nf === '1') {
@@ -499,8 +536,15 @@ export default {
       }
     },
     handleSubmit () {
-      EventBus.$emit('submit', this.submitControl++)
+      console.log('ok')
+      // if (this.submitControl === 0) {
+      this.$emit('newPresell', this.submitControl++)
+      // }
+      // this.submitControl++
     }
+  },
+  created () {
+    this.handleSubmit = throttle(this.handleSubmit, 500)
   }
 }
 </script>

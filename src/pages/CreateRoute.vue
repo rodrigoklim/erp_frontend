@@ -603,7 +603,7 @@ export default {
           self.zone.push(item.address.zone)
         } else {
           self.zone.forEach(function (zoneItem) {
-            if (zoneItem !== item.address.zone) {
+            if (zoneItem.toUpperCase() !== item.address.zone.toUpperCase()) {
               self.zone.push(item.address.zone)
             }
           })
