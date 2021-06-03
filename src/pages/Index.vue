@@ -1,69 +1,85 @@
 <template>
   <q-page class="flex">
-    <div class="row fit justify-center items-center content-start">
+    <div class="row fit justify-center">
       <div class="col-11 q-mt-md">
-        <q-card
-          dark
-          class="full-width"
-          style="border-radius: 2em; overflow: inherit !important; color:white; opacity:0.75; font-family: poppins; font-weight: 200"
-        >
-          <q-card-section>
-            <div class="row">
-              <div class="col">
-                <div class="text-h4">Tarefas</div>
-              </div>
-              <div class="col">
-                <div class="row justify-end">
-                  <q-btn
-                    flat
-                    no-caps
-                    icon="add_task"
-                    label="Nova Tarefa"
-                    @click="newTaskDialog = !newTaskDialog"
-                  />
+        <div class="q-ml-md">
+          <q-card
+            dark
+            class="full-width"
+            style="border-radius: 2em; overflow: inherit !important; color:white; opacity:0.75; font-family: poppins; font-weight: 200"
+          >
+            <q-card-section>
+              <div class="row">
+                <div class="col">
+                  <div class="text-h4">Tarefas</div>
+                </div>
+                <div class="col">
+                  <div class="row justify-end">
+                    <q-btn
+                      flat
+                      no-caps
+                      icon="add_task"
+                      label="Nova Tarefa"
+                      @click="newTaskDialog = !newTaskDialog"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </q-card-section>
+            </q-card-section>
 
-          <q-separator
-            dark
-            inset
-          />
-          <q-card-section>
-            <q-table
-              :dense="$q.screen.lt.md"
-              :data="tasks"
-              :columns="columns"
-              row-key="name"
+            <q-separator
               dark
-              color="amber"
-              style="color:white; opacity:0.95; font-family: poppins; font-weight: 300;"
-              :loading="visible"
-            >
-              <template v-slot:body-cell-created_at="props">
-                <q-td :props="props">
-                  {{dateFilter(props.row.created_at)}}
-                </q-td>
-              </template>
-              <template v-slot:body-cell-endTask="props">
-                <q-td :props="props">
-                  <q-btn
-                    @click="endTaskBtn(props.row.id)"
-                    label="Terminar Tarefa"
-                    style="background-color: #757575"
+              inset
+            />
+            <q-card-section>
+              <q-table
+                :dense="$q.screen.lt.md"
+                :data="tasks"
+                :columns="columns"
+                row-key="name"
+                dark
+                color="amber"
+                style="color:white; opacity:0.95; font-family: poppins; font-weight: 300;"
+                :loading="visible"
+              >
+                <template v-slot:body-cell-created_at="props">
+                  <q-td :props="props">
+                    {{dateFilter(props.row.created_at)}}
+                  </q-td>
+                </template>
+                <template v-slot:body-cell-endTask="props">
+                  <q-td :props="props">
+                    <q-btn
+                      @click="endTaskBtn(props.row.id)"
+                      label="Terminar Tarefa"
+                      style="background-color: #757575"
+                    />
+                  </q-td>
+                </template>
+                <template v-slot:loading>
+                  <q-inner-loading
+                    showing
+                    color="primary"
                   />
-                </q-td>
-              </template>
-              <template v-slot:loading>
-                <q-inner-loading
-                  showing
-                  color="primary"
-                />
-              </template>
-            </q-table>
-          </q-card-section>
-        </q-card>
+                </template>
+              </q-table>
+            </q-card-section>
+          </q-card>
+        </div>
+      </div>
+      <div class="col-1 q-mt-xl">
+        <div class="row justify-center">
+          <fuel
+            @update='update'
+            :key="reload"
+          ></fuel>
+        </div>
+        <div class="row justify-center q-mt-md">
+          <load
+            @reload='updateLoad'
+            :key="reloadTruck"
+          ></load>
+        </div>
       </div>
     </div>
     <!-- nova tarefa -->
@@ -175,9 +191,12 @@
 <script>
 import moment from 'moment'
 import apiClient from '../services/api'
+import Fuel from 'src/components/Fuel.vue'
+import Load from 'src/components/Load.vue'
 // Vue.use(require('vue-moment'))
 
 export default {
+  components: { Fuel, Load },
   name: 'PageIndex',
   data () {
     return {
@@ -192,7 +211,9 @@ export default {
       endTaskId: '',
       newTaskDialog: false,
       newTaskText: '',
-      visible: false
+      visible: false,
+      reload: 0,
+      reloadTruck: 0
     }
   },
   mounted () {
@@ -271,8 +292,14 @@ export default {
       }).catch(error => {
         console.log(error)
       })
+    },
+    update () {
+      this.reload++
+    },
+    updateLoad () {
+      console.log('ok')
+      this.reloadTruck++
     }
-
   }
 }
 </script>
