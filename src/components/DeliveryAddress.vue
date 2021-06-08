@@ -367,15 +367,32 @@ export default {
       const i = this.zoneControl
       this.address[i].zone = zone
     },
+    // geolocation (i) {
+    //   // const self = this
+    //   const addressSearched = this.address[i].street + ' ' + this.address[i].number + ' ' + this.address[i].district + ' ' + this.address[i].city + ' ' + this.address[i].state
+    //   const urlPrefix = 'https://api.mapbox.com/geocoding/v5/mapbox.places/'
+    //   const urlSuffix = '.json?access_token=pk.eyJ1Ijoicm9kcmlnb2tsaW0iLCJhIjoiY2tsMXFqZ3N0MDRreTJubDE0cXE2ajgyNyJ9.Q3uw6cMgSJ6HOuS8K3Wnjg'
+
+    //   this.$axios.get(urlPrefix + addressSearched + urlSuffix).then(res => {
+    //     this.address[i].latitude = res.data.features[0].center[1]
+    //     this.address[i].longitude = res.data.features[0].center[0]
+    //     this.$forceUpdate()
+    //     this.numberEmpty = false
+    //   }).catch(error => {
+    //     console.log('error', error)
+    //     return error
+    //   })
+    // },
     geolocation (i) {
       // const self = this
       const addressSearched = this.address[i].street + ' ' + this.address[i].number + ' ' + this.address[i].district + ' ' + this.address[i].city + ' ' + this.address[i].state
-      const urlPrefix = 'https://api.mapbox.com/geocoding/v5/mapbox.places/'
-      const urlSuffix = '.json?access_token=pk.eyJ1Ijoicm9kcmlnb2tsaW0iLCJhIjoiY2tsMXFqZ3N0MDRreTJubDE0cXE2ajgyNyJ9.Q3uw6cMgSJ6HOuS8K3Wnjg'
+      const urlPrefix = 'https://geocode.search.hereapi.com/v1/geocode?q='
+      const urlSuffix = '&apiKey=cEMLQ9B5ZC1GMSUTuOHBEs7pxKuGfkm5LFgNe0QcWTA'
 
       this.$axios.get(urlPrefix + addressSearched + urlSuffix).then(res => {
-        this.address[i].latitude = res.data.features[0].center[1]
-        this.address[i].longitude = res.data.features[0].center[0]
+        console.log(res)
+        this.address[i].latitude = res.data.items[0].position.lat
+        this.address[i].longitude = res.data.items[0].position.lng
         this.$forceUpdate()
         this.numberEmpty = false
       }).catch(error => {

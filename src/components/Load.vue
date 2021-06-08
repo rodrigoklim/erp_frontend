@@ -18,7 +18,7 @@
       <q-card dark>
         <q-card-section>
           <div class="text-h4">
-            Abastecimento de Combustível
+            Abastecimento de Carga
           </div>
         </q-card-section>
         <!-- separator -->
@@ -225,6 +225,7 @@ export default {
   },
   mounted () {
     this.loadVehicles()
+    this.getDrivers()
   },
   methods: {
     loadVehicles () {

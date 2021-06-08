@@ -60,10 +60,17 @@
                       <l-marker
                         ref="markers"
                         :lat-lng="marker.value"
-                        v-for="(marker, index) in markers"
+                        v-for="marker, index in markers"
                         :key="index"
-                        :icon="marker.icon"
-                      />
+                      >
+                        <l-popup>{{marker.text}} - {{marker.value}}</l-popup>
+                        <l-icon
+                          :icon-size="dynamicSize"
+                          :icon-anchor="dynamicAnchor"
+                          :icon-url="marker.icon"
+                        >
+                        </l-icon>
+                      </l-marker>
                       <div v-if="truck.set">
                         <l-marker :lat-lng="truck.coords">
                           <l-icon
@@ -87,7 +94,7 @@
               <div class="col-3">
                 <delivery-route
                   :routeOrder="customers"
-                  :routeNextCostumers='next'
+                  :routeNextCostumers="next"
                 ></delivery-route>
               </div>
             </div>
@@ -100,7 +107,7 @@
 
 <script>
 import { latLng, Icon } from 'leaflet'
-import { LMap, LTileLayer, LMarker, LPolyline, LIcon } from 'vue2-leaflet'
+import { LMap, LTileLayer, LMarker, LPolyline, LIcon, LPopup } from 'vue2-leaflet'
 import RouteList from 'components/RouteList'
 import DeliveryRoute from 'components/DeliveryRoute'
 import apiClient from 'src/services/api'
@@ -120,7 +127,8 @@ export default {
     LTileLayer,
     LMarker,
     LPolyline,
-    LIcon
+    LIcon,
+    LPopup
   },
   data () {
     return {
@@ -167,6 +175,8 @@ export default {
         data: newVal.routeOrder[0].route_id
       }
       apiClient.post(url, params, config).then(response => {
+        this.markers = []
+        this.route = []
         this.handlePolyline(response.data)
         this.next = response.data
       })
@@ -174,13 +184,22 @@ export default {
       this.getPosition()
       this.makePeriodic()
     },
-    handleMarkers (data) {
+    handleMarkers (data, popup) {
+      console.log(data, popup)
+      let icon = ''
+      if (popup === 'Final da Rota') {
+        icon = require('../assets/img/miniatura_novo.png')
+      }
+      const m = data.pointB.split(',').reverse()
       this.markers.push({
-        value: latLng(data.pointB.split(',').reverse())
+        value: [parseFloat(m[0]), parseFloat(m[1])],
+        text: popup,
+        icon: icon
       })
       this.center = this.truck.coords
     },
     handlePolyline (data) {
+      console.log(data)
       const self = this
       this.route = []
       this.markers = []
@@ -188,7 +207,7 @@ export default {
       this.truck.coords = latLng(data.matrix[0].markers.pointA.split(',').reverse())
 
       data.matrix.forEach(function (item) {
-        self.handleMarkers(item.markers)
+        self.handleMarkers(item.markers, item.nickname)
         item.route.forEach(function (coords) {
           path.push([coords[1], coords[0]])
         })
@@ -213,9 +232,11 @@ export default {
         data: item
       }
       apiClient.post(url, params, config).then(response => {
-        this.truck.coords = latLng(response.data[1], response.data[0])
-        this.truck.set = true
-        this.$forceUpdate()
+        if (response.data !== 0) {
+          this.truck.coords = latLng(response.data[1], response.data[0])
+          this.truck.set = true
+          this.$forceUpdate()
+        }
       }).catch(error => {
         if (error.response) {
           console.log(error.response.data)
@@ -240,6 +261,14 @@ export default {
         1000 *
         60 * 1
       )
+    }
+  },
+  computed: {
+    dynamicSize () {
+      return [this.iconSize, this.iconSize * 1.15]
+    },
+    dynamicAnchor () {
+      return [this.iconSize / 2, this.iconSize * 1.15]
     }
   }
 }

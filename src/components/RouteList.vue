@@ -7,7 +7,7 @@
       <q-card-section>
         <div class="text-h5">Lista de Rotas</div>
       </q-card-section>
-      <q-separator dark/>
+      <q-separator dark />
       <q-card-section>
         <q-list
           bordered
@@ -33,23 +33,26 @@
                 class="q-mt-sm"
                 align="end"
               >
-                <q-avatar v-if="delivery.status === '3'"
-                          icon="far fa-bell"
-                          color="accent"
-                          size="sm"
-
+                <q-avatar
+                  v-if="delivery.status === '3'"
+                  icon="far fa-bell"
+                  color="accent"
+                  size="sm"
                 />
-                <q-avatar v-if="lastCustomer[index]"
+                <q-avatar
+                  v-if="lastCustomer[index]"
                   icon="fas fa-flag-checkered"
                   color="positive"
                   size="sm"
                 />
-                <q-avatar v-if="hasChat"
+                <q-avatar
+                  v-if="hasChat"
                   icon="fas fa-comment-dots"
                   color="pink"
                   size="sm"
                 />
-                <q-avatar v-if="mechanicAlert"
+                <q-avatar
+                  v-if="mechanicAlert"
                   icon="fas fa-wrench"
                   color="red-6"
                   size="sm"
@@ -81,19 +84,37 @@
     </q-card>
 
     <!--Awaiting Auth Dialog-->
-    <q-dialog v-model="loadChecklist" id="print">
-      <q-card dark style="width: 500px; max-width: 80vw;">
+    <q-dialog
+      v-model="loadChecklist"
+      id="print"
+    >
+      <q-card
+        dark
+        style="width: 500px; max-width: 80vw;"
+      >
         <q-card-section>
           <div class="row">
             <div class="col">
               <div class="text-h5">Checklist de Carga</div>
             </div>
-            <div class="col q-mt-sm" align="end">
-              <q-icon class="" name="far fa-times-circle" size="20px" @click="loadChecklist = !loadChecklist" style="cursor: pointer"/>
+            <div
+              class="col q-mt-sm"
+              align="end"
+            >
+              <q-icon
+                class=""
+                name="far fa-times-circle"
+                size="20px"
+                @click="loadChecklist = !loadChecklist"
+                style="cursor: pointer"
+              />
             </div>
           </div>
         </q-card-section>
-        <q-separator dark inset/>
+        <q-separator
+          dark
+          inset
+        />
         <q-card-section>
           <q-table
             dark
@@ -104,17 +125,21 @@
             hide-pagination
           >
             <template v-slot:body="props">
-                <q-tr :props="props" v-for="(load, index) in loadProducts" :key="index">
-                  <q-td>
-                    {{load.product}}
-                  </q-td>
-                  <q-td align="center">{{load.qty + ' ' + load.unity}}</q-td>
-                </q-tr>
+              <q-tr
+                :props="props"
+                v-for="(load, index) in loadProducts"
+                :key="index"
+              >
+                <q-td>
+                  {{load.product}}
+                </q-td>
+                <q-td align="center">{{load.qty + ' ' + load.unity}}</q-td>
+              </q-tr>
               <q-tr :props="props">
-                  <q-td>
-                    Botijão Criogênico
-                  </q-td>
-                  <q-td align="center">{{props.row.bot_crio}}</q-td>
+                <q-td>
+                  Botijão Criogênico
+                </q-td>
+                <q-td align="center">{{props.row.bot_crio}}</q-td>
               </q-tr>
               <q-tr :props="props">
                 <q-td>
@@ -156,8 +181,17 @@
           </q-table>
         </q-card-section>
         <q-card-actions align="around">
-          <q-btn label="Imprimir" color="primary" push @click="print"/>
-          <q-btn push color="positive" @click="askAuth(auth)">Autorizar Saída</q-btn>
+          <q-btn
+            label="Imprimir"
+            color="primary"
+            push
+            @click="print"
+          />
+          <q-btn
+            push
+            color="positive"
+            @click="askAuth(auth)"
+          >Autorizar Saída</q-btn>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -211,7 +245,8 @@ export default {
       ],
       lastCustomer: [],
       hasChat: false,
-      mechanicAlert: false
+      mechanicAlert: false,
+      route: null
     }
   },
   mounted: function () {
@@ -246,6 +281,7 @@ export default {
   },
   methods: {
     routeClick (item) {
+      this.route = item
       if (item.status === '3') {
         this.loadChecklist = true
         this.loadChecklistTable = [item.load_checklist]
@@ -264,7 +300,6 @@ export default {
         data: item.id
       }
       apiClient.post(url, params, config).then(response => {
-        console.log(response.data)
         this.$emit('routePath', response.data)
       }).catch(error => {
         if (error.response) {
@@ -394,10 +429,14 @@ export default {
         }
       })
     }
+  },
+  created () {
+    EventBus.$on('customerUpdated', (val) => {
+      this.routeClick(this.route)
+    })
   }
 }
 </script>
 
 <style scoped>
-
 </style>

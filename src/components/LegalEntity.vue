@@ -445,10 +445,6 @@ export default {
       this.pmsg++
       this.pamsg++
       this.getPhones++
-      // const self = this
-      // setTimeout(function () {
-      //   self.submit()
-      // }, 800)
     },
     submit () {
       const url = '/costumer/le/create'

@@ -208,8 +208,12 @@ export default {
       this.presell.observation = data
     },
     submit (payload) {
-      console.log(payload)
-      const url = '/presell/create'
+      let url
+      if (this.presell.route_id.length > 0) {
+        url = '/route/ongoing/addCustomer'
+      } else {
+        url = '/presell/create'
+      }
       const config = {
         headers: {
           Authorization: 'Bearer ' + localStorage.token
@@ -229,6 +233,15 @@ export default {
               message: 'Prevenda Cadastrada com sucesso!',
               position: 'top-right'
             })
+          })
+        } else if (this.presell.route_id.length > 0) {
+          EventBus.$emit('customerUpdated', response.data)
+          this.$emit('customerUpdated')
+          this.$q.notify({
+            color: 'teal',
+            icon: 'check',
+            message: 'Cliente adicionado com sucesso!',
+            position: 'top-right'
           })
         }
         this.obs = !this.obs
@@ -267,19 +280,15 @@ export default {
     EventBus.$on('presellObservation', (data) => {
       this.updateObservation(data)
     })
-    // EventBus.$on('submit', (data) => {
-    //   console.log(data)
-    //   if (data === 0) {
-    //     this.submit()
-    //   }
-    // })
+
+    this.$emit('checkRoute', 'done')
     localStorage.payCode = false
     this.submit = throttle(this.submit, 500)
   },
   watch: {
     ongoing: function (newVal, oldVal) {
-      console.log(newVal, oldVal)
-      console.log('oi')
+      this.presell.route_id = newVal
+      console.log(this.presell.route_id)
     }
   }
 }

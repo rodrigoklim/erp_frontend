@@ -363,7 +363,8 @@ export default {
         firstDayOfWeek: 1
       },
       observations: '',
-      obsmsg: 0
+      obsmsg: 0,
+      route_id: ''
     }
   },
   mounted () {
@@ -379,7 +380,6 @@ export default {
       self.costumers = response.data[0]
       if (response.data[1]) {
         response.data[1].forEach(function (value) {
-          console.log(value)
           self.costumers.push(value)
         })
       }
