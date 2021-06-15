@@ -581,6 +581,7 @@ export default {
       })
     },
     vehicleDetails (value) {
+      console.log(value)
       this.fuel.min = 0
       this.fuel.max = parseFloat(value.vehicle.fuel_tank)
       this.fuel.value = parseFloat(value.fuel.balance) - (parseFloat(this.details.totalLength) / (parseFloat(value.vehicle.autonomy) / 100))

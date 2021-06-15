@@ -150,7 +150,7 @@
         >
 
           <q-item-label header>Ponto Final:</q-item-label>
-          <div v-if="end.nickname">
+          <!-- <div v-if="end.nickname">
             <q-item>
               <q-item-section>
                 <q-item-label
@@ -167,19 +167,36 @@
                 >{{ end.time }}</q-item-label>
               </q-item-section>
             </q-item>
-          </div>
-          <!-- <q-select
+          </div> -->
+          <q-select
             dark
-            outlined
-            label="Ponto Final"
             :options="destiny"
+            borderless
             @input="updateRoute"
             v-model="Ldestiny"
             dense
             class="text-uppercase"
             :rules="[val => !!val || 'Campo obrigatório.']"
           >
-          </q-select> -->
+            <template v-slot:selected>
+              <q-item>
+                <q-item-section>
+                  <q-item-label
+                    class="text-amber"
+                    style="font-weight: bold; opacity: 0.85;"
+                  >{{ end.nickname }}</q-item-label>
+                  <q-item-label
+                    caption
+                    style="font-weight: 500; font-size: 11px"
+                  >Previsão:</q-item-label>
+                  <q-item-label
+                    caption
+                    style="font-weight: 500; font-size: 11px"
+                  >{{ end.time }}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
         </q-list>
       </q-card-section>
     </q-card>
@@ -199,6 +216,132 @@
             @customerUpdated="customerUpdated"
           ></pre-sell>
         </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="saleDialog">
+      <q-card
+        dark
+        style="width: 400px; max-width: 80vw;"
+      >
+        <q-card-section>
+          <div class="text-h5">Venda</div>
+        </q-card-section>
+        <q-separator
+          color="white"
+          style="opacity:0.85"
+        />
+        <q-form
+          ref="form"
+          autofocus
+          spellcheck="false"
+          autocomplete="off"
+          @submit.prevent.stop="submitSell"
+          greedy
+        >
+          <q-card-section>
+            <div class="row q-ml-md">
+              <span class="poppins q-mt-md">O Motorista já passou pelo cliente?</span>
+            </div>
+            <div class="row q-ml-md">
+              <q-radio
+                dense
+                v-model="delivered"
+                dark
+                val="yes"
+                label="Sim"
+              />
+              <q-radio
+                dark
+                dense
+                v-model="delivered"
+                val="no"
+                label="Não"
+                class="q-ml-md"
+              />
+            </div>
+          </q-card-section>
+          <q-card-section>
+            <q-list
+              dark
+              separator
+            >
+
+              <q-item
+                v-for="sale, index in saleProducts"
+                :key="index"
+                class="q-mb-lg"
+              >
+                <q-item-section>
+                  <q-item-label class="poppins  q-mt-md">
+                    {{sale.product}}
+                  </q-item-label>
+                  <q-item-label>
+                    <div class="row">
+
+                      <div class="col">
+                        <q-input
+                          dark
+                          outlined
+                          label="Qtd Abastecida"
+                          v-model="sale.qty"
+                          dense
+                          mask="#.#"
+                          fill-mask="0"
+                          reverse-fill-mask
+                          :suffix="sale.unity"
+                        />
+                      </div>
+
+                      <div class="col">
+                        <q-input
+                          class="q-ml-md"
+                          dark
+                          outlined
+                          label="Qtd Entregue"
+                          v-model="sale.qty_sell"
+                          dense
+                          mask="#.#"
+                          fill-mask="0"
+                          reverse-fill-mask
+                          :suffix="sale.unity"
+                          :rules="[val => !!val || 'Campo obrigatório.' ]"
+                        />
+                      </div>
+                    </div>
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-card-section>
+          <q-separator dark />
+          <q-card-actions
+            align="around"
+            class="q-my-md"
+          >
+            <q-btn
+              push
+              label="Cancelar"
+              color="red-6"
+              v-close-popup
+              @click="clearFields(saleProducts)"
+            />
+            <q-btn
+              push
+              label="Cadastrar"
+              color="primary"
+              type="submit"
+              :loading="submitting"
+            >
+              <template v-slot:loading>
+                <q-spinner-orbit
+                  color="white"
+                  size="1.35em"
+                />
+              </template>
+            </q-btn>
+          </q-card-actions>
+        </q-form>
       </q-card>
     </q-dialog>
   </div>
@@ -239,10 +382,72 @@ export default {
           label: 'Piracaia'
         }
       ],
-      end: []
+      end: [],
+      delivered: 'no',
+      sale: [{
+        presell_id: null,
+        id: null,
+        qty: null,
+        qty_sell: null
+      }],
+      saleDialog: false,
+      saleProducts: [],
+      submitting: false
     }
   },
   methods: {
+    submitSell () {
+      const url = '/sale'
+      const config = {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.token
+        }
+      }
+      const params = {
+        data: {
+          route_id: this.flag,
+          products: this.saleProducts,
+          delivered: this.delivered
+        }
+      }
+      apiClient.post(url, params, config).then(response => {
+        console.log(response.data)
+        if (response.data === 'ok') {
+          this.$q.notify({
+            color: 'teal',
+            icon: 'check',
+            message: 'Venda realizada com sucesso!',
+            position: 'top-right'
+          })
+        }
+      }).catch(error => {
+        if (error.response) {
+          // this.handleError()
+          this.submitting = false
+          console.log(error.response.data)
+          console.log(error.response.status)
+          console.log(error.response.headers)
+        } else if (error.request) {
+          // this.handleError()
+          this.submitting = false
+          console.log(error.request)
+        } else {
+          // Something happened in setting up the request and triggered an Error
+          // this.handleError()
+          console.log('Error', error.message)
+        }
+      })
+    },
+    clearFields (item) {
+      item.forEach(function (val) {
+        val.qty = 0
+        val.qty_sell = 0
+      })
+    },
+    makeSale (item) {
+      this.saleProducts = item.products
+      this.saleDialog = true
+    },
     removeCompany (item) {
       this.$q.notify({
         color: 'red-6',
@@ -314,9 +519,11 @@ export default {
         }
       }
       const params = {
-        data: this.next
+        data: this.next,
+        end: this.Ldestiny
       }
       apiClient.post(url, params, config).then(response => {
+        console.log(response.data)
         if (response.data === 'ok') {
           EventBus.$emit('customerUpdated', response.data)
           this.addCustomer = false
@@ -360,7 +567,6 @@ export default {
       const self = this
       list.forEach(function (item) {
         if (item.nickname === 'Final da Rota') {
-          console.log(item)
           self.destiny.forEach(function (val) {
             if (val.value === item.markers.pointB) {
               self.Ldestiny = val.label
